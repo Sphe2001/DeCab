@@ -24,9 +24,9 @@ public class Vehicle {
     private String numberPlate;
     private String colour;
     private Integer Size;
+    private String carType;
     @Lob
     private byte[] insurance;
-    private String carType;
     @Lob
     private byte[] image;
 }
