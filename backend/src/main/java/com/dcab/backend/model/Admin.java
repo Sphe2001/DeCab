@@ -24,7 +24,7 @@ public class Admin implements UserDetails {
     @Id
     @GeneratedValue
     private Integer adminId;
-    private Integer stuffNumber;
+    private String staffNumber;
     private String firstName;
     private String email;
     private String password;
@@ -41,7 +41,7 @@ public class Admin implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return staffNumber;
     }
 
     @Override
