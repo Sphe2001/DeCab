@@ -1,8 +1,9 @@
-package com.dcab.backend.clientAuth;
+package com.dcab.backend.driverAuth;
+
 
 import com.dcab.backend.clientConfig.JwtService;
-import com.dcab.backend.model.Client;
-import com.dcab.backend.repository.ClientRepository;
+import com.dcab.backend.model.Driver;
+import com.dcab.backend.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,38 +12,41 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService {
-
-    private final ClientRepository repository;
+public class AuthenticationService2 {
+    private final DriverRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
-        var client = Client.builder()
+    public AuthenticationResponse2 registerDriver(RegisterRequest2 request) {
+        var driver = Driver.builder()
                 .firstName(request.getFirstName())
-                .email(request.getEmail())
+                .lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber())
+                .licence(request.getLicence())
+                .id(request.getId())
+                .photo(request.getPhoto())
+                .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        repository.save(client);
-        var jwtToken = jwtService.generateToken(client);
-        return  AuthenticationResponse.builder()
+        repository.save(driver);
+        var jwtToken = jwtService.generateToken(driver);
+        return  AuthenticationResponse2.builder()
                 .token(jwtToken)
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+    public AuthenticationResponse2 authenticateDriver(AuthenticationRequest2 request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()
                 )
         );
-        var client = repository.findByEmail(request.getEmail())
+        var driver = repository.findByEmail(request.getEmail())
                 .orElseThrow();
-        var jwtToken = jwtService.generateToken(client);
-        return AuthenticationResponse.builder()
+        var jwtToken = jwtService.generateToken(driver);
+        return AuthenticationResponse2.builder()
                 .token(jwtToken)
                 .build();
     }

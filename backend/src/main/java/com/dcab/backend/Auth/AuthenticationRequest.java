@@ -1,4 +1,4 @@
-package com.dcab.backend.clientAuth;
+package com.dcab.backend.Auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class AuthenticationRequest {
 
-    private String firstName;
     private String email;
-    private String phoneNumber;
     private String password;
 }

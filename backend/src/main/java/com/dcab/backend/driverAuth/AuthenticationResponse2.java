@@ -1,4 +1,4 @@
-package com.dcab.backend.clientAuth;
+package com.dcab.backend.driverAuth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+
+public class AuthenticationResponse2 {
 
     private String token;
 }
