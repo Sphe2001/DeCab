@@ -1,7 +1,7 @@
 package com.dcab.backend.driverAuth;
 
 
-import com.dcab.backend.clientConfig.JwtService;
+import com.dcab.backend.config.JwtService;
 import com.dcab.backend.model.Driver;
 import com.dcab.backend.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;

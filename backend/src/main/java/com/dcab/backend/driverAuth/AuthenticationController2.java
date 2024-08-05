@@ -1,9 +1,5 @@
 package com.dcab.backend.driverAuth;
 
-import com.dcab.backend.adminAuth.AuthenticationRequest1;
-import com.dcab.backend.adminAuth.AuthenticationResponse1;
-import com.dcab.backend.adminAuth.AuthenticationService1;
-import com.dcab.backend.adminAuth.RegisterRequest1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

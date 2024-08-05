@@ -1,4 +1,4 @@
-package com.dcab.backend.clientConfig;
+package com.dcab.backend.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

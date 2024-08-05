@@ -1,4 +1,4 @@
-package com.dcab.backend.clientConfig;
+package com.dcab.backend.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

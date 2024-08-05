@@ -1,6 +1,6 @@
 package com.dcab.backend.adminAuth;
 
-import com.dcab.backend.clientConfig.JwtService;
+import com.dcab.backend.config.JwtService;
 import com.dcab.backend.model.Admin;
 import com.dcab.backend.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;

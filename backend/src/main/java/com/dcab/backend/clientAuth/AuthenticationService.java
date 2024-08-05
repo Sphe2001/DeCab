@@ -1,6 +1,6 @@
-package com.dcab.backend.Auth;
+package com.dcab.backend.clientAuth;
 
-import com.dcab.backend.clientConfig.JwtService;
+import com.dcab.backend.config.JwtService;
 import com.dcab.backend.model.Client;
 import com.dcab.backend.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;

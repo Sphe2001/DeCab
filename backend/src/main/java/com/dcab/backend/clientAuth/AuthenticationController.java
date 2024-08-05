@@ -1,4 +1,4 @@
-package com.dcab.backend.Auth;
+package com.dcab.backend.clientAuth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

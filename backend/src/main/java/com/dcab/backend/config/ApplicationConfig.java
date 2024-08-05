@@ -1,6 +1,8 @@
-package com.dcab.backend.clientConfig;
+package com.dcab.backend.config;
 
+import com.dcab.backend.repository.AdminRepository;
 import com.dcab.backend.repository.ClientRepository;
+import com.dcab.backend.repository.DriverRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,18 +19,32 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final ClientRepository repository;
+    private final ClientRepository clientRepository;
+    private final AdminRepository adminRepository;
+    private final DriverRepository driverRepository;
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> repository.findByEmail(username)
+    public UserDetailsService clientDetailsService() {
+        return username -> clientRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+    @Bean
+    public UserDetailsService adminDetailsService(){
+        return username -> adminRepository.findByStaffNumber(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+    }
+    @Bean
+    public UserDetailsService driverDetailsService(){
+        return username -> driverRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setUserDetailsService(clientDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
