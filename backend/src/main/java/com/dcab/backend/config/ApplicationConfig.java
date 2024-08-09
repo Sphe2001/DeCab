@@ -24,27 +24,35 @@ public class ApplicationConfig {
     private final DriverRepository driverRepository;
 
     @Bean
-    public UserDetailsService clientDetailsService() {
-        return username -> clientRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-    @Bean
-    public UserDetailsService adminDetailsService(){
-        return username -> adminRepository.findByStaffNumber(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            // First, check the ClientRepository
+            var client = clientRepository.findByEmail(username);
+            if (client.isPresent()) {
+                return client.get();
+            }
 
-    }
-    @Bean
-    public UserDetailsService driverDetailsService(){
-        return username -> driverRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            // Then, check the AdminRepository
+            var admin = adminRepository.findByStaffNumber(username);
+            if (admin.isPresent()) {
+                return admin.get();
+            }
 
+            // Finally, check the DriverRepository
+            var driver = driverRepository.findByEmail(username);
+            if (driver.isPresent()) {
+                return driver.get();
+            }
+
+            // If no user is found in any of the repositories, throw an exception
+            throw new UsernameNotFoundException("User not found");
+        };
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(clientDetailsService());
+        authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
