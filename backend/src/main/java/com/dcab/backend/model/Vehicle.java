@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "Vehicles")
-public class Vehicle {
+public class
+Vehicle {
 
     @Id
     @GeneratedValue
