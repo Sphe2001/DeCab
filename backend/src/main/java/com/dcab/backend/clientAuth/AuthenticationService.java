@@ -19,17 +19,23 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var client = Client.builder()
-                .firstName(request.getFirstName())
-                .email(request.getEmail())
-                .phoneNumber(request.getPhoneNumber())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .build();
-        repository.save(client);
-        var jwtToken = jwtService.generateToken(client);
-        return  AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
+
+        if (repository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+            var client = Client.builder()
+                    .firstName(request.getFirstName())
+                    .email(request.getEmail())
+                    .phoneNumber(request.getPhoneNumber())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .build();
+            repository.save(client);
+             var jwtToken = jwtService.generateToken(client);
+
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .build();
+
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
