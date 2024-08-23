@@ -1,8 +1,9 @@
 
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import LoginPage from './web_pages/LoginPage'
-import HomePage from './web_pages/HomePage'
+import ClientHomePage from './web_pages/ClientHomePage'
 import RegisterPage from './web_pages/RegisterPage'
+import DriverHomePage from './web_pages/DriverHomePage'
 
 function App() {
 
@@ -11,7 +12,8 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/' element ={<LoginPage/>}/>
-            <Route path='/home' element ={<HomePage/>}/>
+            <Route path='/c-home' element ={<ClientHomePage/>}/>
+            <Route path='/d-home' element ={<DriverHomePage/>}/>
             <Route path='/register' element ={<RegisterPage/>}/>
           </Routes>
         </BrowserRouter>

@@ -2,8 +2,8 @@ import React from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function HomePage() {
+export default function ClientHomePage() {
   return (
-    <div>HomePage</div>
+    <div>ClientHomePage</div>
   )
 }
