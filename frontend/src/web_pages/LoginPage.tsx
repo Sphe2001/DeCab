@@ -18,7 +18,6 @@ export default function LoginPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const user = selectedOption;
 
   let goToPage = '/c-home';
 
@@ -28,7 +27,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: FormEvent <HTMLFormElement>) => {
     e.preventDefault();
-      const response = await axios.post(`http://localhost:8181/api/${user}/auth/authenticate`, formData)
+      const response = await axios.post(`http://localhost:8181/api/${selectedOption}/auth/authenticate`, formData)
       .then(() => {
         navigate(goToPage);
         toast.success("Successfully logged in!");
