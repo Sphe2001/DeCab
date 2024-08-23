@@ -10,17 +10,26 @@ export default function LoginPage() {
     password: ''
   });
 
+  const [selectedOption, setSelectedOption] = useState('client');
+
   const navigate = useNavigate();
  
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+
+  let goToPage = '/c-home';
+
+  if(selectedOption === 'driver'){
+    goToPage = '/d-home';
+  }
+
   const handleSubmit = async (e: FormEvent <HTMLFormElement>) => {
     e.preventDefault();
-      const response = await axios.post('http://localhost:8181/api/client/auth/authenticate', formData)
+      const response = await axios.post(`http://localhost:8181/api/${selectedOption}/auth/authenticate`, formData)
       .then(() => {
-        navigate('/home');
+        navigate(goToPage);
         toast.success("Successfully logged in!");
       })
       .catch(() => {
@@ -46,6 +55,44 @@ export default function LoginPage() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form onSubmit={handleSubmit} method="POST" className="space-y-6">
+            <div className="flex justify-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="client"
+                  checked={selectedOption === 'client'}
+                  onChange={() => setSelectedOption('client')}
+                  className="hidden peer"
+                />
+                <span
+                  className={`px-6 py-2 min-w-[120px] text-center border border-violet-600 rounded 
+                    ${selectedOption === 'client' ? 'text-white bg-violet-600' : 'text-violet-600 hover:bg-violet-600 hover:text-white'} 
+                    focus:outline-none focus:ring`}
+                >
+                  Rider
+                </span>
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="role"
+                  value="driver"
+                  checked={selectedOption === 'driver'}
+                  onChange={() => setSelectedOption('driver')}
+                  className="hidden peer"
+                />
+                <span
+                  className={`px-6 py-2 min-w-[120px] text-center border border-violet-600 rounded 
+                    ${selectedOption === 'driver' ? 'text-white bg-violet-600' : 'text-violet-600 hover:bg-violet-600 hover:text-white'} 
+                    focus:outline-none focus:ring`}
+                >
+                  Driver
+                </span>
+              </label>
+            </div>
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                 Email address
@@ -106,7 +153,7 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-    </div>
+</div>
   );
 }
 
