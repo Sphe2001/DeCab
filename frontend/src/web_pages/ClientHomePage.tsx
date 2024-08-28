@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,13 +9,17 @@ export default function ClientHomePage() {
   const [location, setLocation] = useState('');
   const [destination, setDestination] = useState('');
 
+  const API_KEY = import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY;
+
+  console.log(API_KEY)
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setMapSrc(
-            `https://www.google.com/maps/embed/v1/place?key=AIzaSyC4Xgd0yHvI-vMI64Z91vg3D7fmCxv9e1k&q=${latitude},${longitude}`
+            `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=${latitude},${longitude}`
           );
         },
         (error) => {
