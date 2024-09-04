@@ -28,6 +28,7 @@ public class Client implements UserDetails {
     private String email;
     private String phoneNumber;
     private String password;
+    private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

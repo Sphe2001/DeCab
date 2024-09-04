@@ -28,6 +28,7 @@ public class AuthenticationService2 {
                 .photo(request.getPhoto())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .role("Driver")
                 .build();
         repository.save(driver);
         var jwtToken = jwtService.generateToken(driver);

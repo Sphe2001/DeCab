@@ -80,7 +80,7 @@ export default function ClientHomePage() {
       <div className="w-full">
         {mapSrc ? (
           <iframe
-            className="w-full h-full"
+            className="w-full h-full p-2"
             loading="lazy"
             allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"

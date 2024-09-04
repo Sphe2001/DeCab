@@ -20,4 +20,5 @@ public class RegisterRequest2 {
     private byte[] licence;
     private byte[] photo;
     private String password;
+    private String role;
 }

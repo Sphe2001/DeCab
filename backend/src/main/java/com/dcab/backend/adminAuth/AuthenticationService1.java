@@ -24,6 +24,7 @@ public class AuthenticationService1 {
                 .firstName(request.getFirstName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .role("Admin")
                 .build();
         repository.save(admin);
         var jwtToken = jwtService.generateToken(admin);

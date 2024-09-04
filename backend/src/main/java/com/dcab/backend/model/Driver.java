@@ -26,6 +26,7 @@ public class Driver implements UserDetails {
     private String email;
     private String phoneNumber;
     private Long id;
+    private String role;
     @Lob
     private byte[] licence;
     @Lob
