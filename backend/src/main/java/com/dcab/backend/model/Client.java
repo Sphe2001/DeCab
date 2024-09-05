@@ -30,6 +30,7 @@ public class Client implements UserDetails {
     private String password;
     private String role;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

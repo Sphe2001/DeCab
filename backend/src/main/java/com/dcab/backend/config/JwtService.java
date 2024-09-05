@@ -1,5 +1,8 @@
 package com.dcab.backend.config;
 
+import com.dcab.backend.model.Admin;
+import com.dcab.backend.model.Client;
+import com.dcab.backend.model.Driver;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -31,7 +34,20 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        if (userDetails instanceof Client) {
+            Client client = (Client) userDetails;
+            extraClaims.put("role", client.getRole());
+        } else if (userDetails instanceof Driver) {
+            Driver driver = (Driver) userDetails;
+            extraClaims.put("role", driver.getRole());
+        } else if (userDetails instanceof Admin) {
+            Admin admin = (Admin) userDetails;
+            extraClaims.put("role", admin.getRole());
+        }
+
+        return generateToken(extraClaims, userDetails);
     }
     public String generateToken(
             Map<String, Object> extraClaims,
@@ -72,5 +88,9 @@ public class JwtService {
     private Key getSigninKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return  Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
     }
 }
