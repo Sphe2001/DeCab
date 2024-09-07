@@ -24,7 +24,7 @@ Vehicle {
     private String name;
     private String numberPlate;
     private String colour;
-    private Integer Size;
+    private Integer seats;
     private String carType;
     @Lob
     private byte[] insurance;
