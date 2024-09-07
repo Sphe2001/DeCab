@@ -1,55 +1,6 @@
-import { useRef, useState } from 'react';
-import {
-  useJsApiLoader,
-  GoogleMap,
-  Marker,
-  DirectionsRenderer,
-} from '@react-google-maps/api';
-
-const center = { lat: 48.8584, lng: 2.2945 };
+import React from 'react';
 
 export default function DriverHomePage() {
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY,
-    libraries: ['places'],
-  });
-
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
-  const [distance, setDistance] = useState<string>('');
-  const [duration, setDuration] = useState<string>('');
-
-  const originRef = useRef<HTMLInputElement>(null);
-  const destinationRef = useRef<HTMLInputElement>(null);
-
-  if (!isLoaded) {
-    return <p>Loading map...</p>;
-  }
-
-  async function calculateRoute(): Promise<void> {
-    if (originRef.current?.value === '' || destinationRef.current?.value === '') {
-      return;
-    }
-
-    const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current?.value as string,
-      destination: destinationRef.current?.value as string,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance?.text || '');
-    setDuration(results.routes[0].legs[0].duration?.text || '');
-  }
-
-  function clearRoute() {
-    setDirectionsResponse(null);
-    setDistance('');
-    setDuration('');
-    if (originRef.current) originRef.current.value = '';
-    if (destinationRef.current) destinationRef.current.value = '';
-  }
-
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="w-full h-2/3">
