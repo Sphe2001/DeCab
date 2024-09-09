@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,95 +5,166 @@ import {
   useJsApiLoader,
   GoogleMap,
   Marker,
-  Autocomplete,
   DirectionsRenderer,
-} from '@react-google-maps/api'
+} from '@react-google-maps/api';
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+
+const defaultCenter = { lat: 48.8584, lng: 2.2945 }; // Fallback center
 
 export default function ClientHomePage() {
-  const [mapSrc, setMapSrc] = useState<string | null>(null);
-  const [location, setLocation] = useState('');
-  const [destination, setDestination] = useState('');
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY,
+    libraries: ['places'],
+  });
 
-  const API_KEY = import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY;
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [mapKey, setMapKey] = useState(1); // Key for reloading the map on clear
+  const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
+  const [distance, setDistance] = useState<string>('');
+  const [duration, setDuration] = useState<string>('');
+  const [center, setCenter] = useState(defaultCenter); // Default center
 
-  console.log(API_KEY)
+  const [origin, setOrigin] = useState<{ label: string; value: any } | null>(null);
+  const [destination, setDestination] = useState<{ label: string; value: any } | null>(null);
+  const [originLocation, setOriginLocation] = useState<google.maps.LatLng | null>(null);
+  const [destinationLocation, setDestinationLocation] = useState<google.maps.LatLng | null>(null);
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setMapSrc(
-            `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=${latitude},${longitude}`
-          );
-        },
-        (error) => {
-          toast.error('Error fetching location');
-          console.error('Error Code = ' + error.code + ' - ' + error.message);
-        }
-      );
-    } else {
-      toast.error('Geolocation is not supported by this browser');
-    }
+    // Get the user's current location and set the map's center
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCenter({ lat: latitude, lng: longitude });
+      },
+      () => {
+        toast.error('Could not retrieve your location');
+      }
+    );
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.info(`Location: ${location}, Destination: ${destination}`);
+  if (!isLoaded) {
+    return <p>Loading map...</p>;
+  }
+
+  async function calculateRoute(e: React.FormEvent): Promise<void> {
+    e.preventDefault(); // Prevent form submission from reloading the page
+
+    if (!origin || !destination) {
+      toast.error('Please select both origin and destination');
+      return;
+    }
+
+    try {
+      const directionsService = new google.maps.DirectionsService();
+      const results = await directionsService.route({
+        origin: origin.label,
+        destination: destination.label,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+      setDirectionsResponse(results);
+      setDistance(results.routes[0].legs[0].distance?.text || '');
+      setDuration(results.routes[0].legs[0].duration?.text || '');
+    } catch (error) {
+      toast.error('Could not calculate the route. Please try again.');
+      console.error('Error calculating route:', error);
+    }
+  }
+
+  function clearRoute() {
+    setDirectionsResponse(null);
+    setDistance('');
+    setDuration('');
+    setOrigin(null);
+    setDestination(null);
+    setOriginLocation(null);
+    setDestinationLocation(null);
+    // Trigger map reload to remove markers
+    setMapKey(mapKey + 1);
+    toast.info('Route cleared');
+  }
+
+  const handleOriginChange = (value: any) => {
+    setOrigin(value);
+    setOriginLocation(value?.value.geometry.location || null); // Set the location for marker
+    setDirectionsResponse(null); // Clear route when origin is changed
+  };
+
+  const handleDestinationChange = (value: any) => {
+    setDestination(value);
+    setDestinationLocation(value?.value.geometry.location || null); // Set the location for marker
+    setDirectionsResponse(null); // Clear route when destination is changed
   };
 
   return (
     <div className="h-screen w-screen flex">
       <div className="w-96 p-8">
         <h1 className="text-2xl font-bold mb-4">Client Home Page</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={calculateRoute} className="space-y-4">
           <div>
             <label className="block text-lg font-medium mb-2" htmlFor="location">
-              Location
+              Origin
             </label>
-            <input
-              id="location"
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Enter your current location"
+            <GooglePlacesAutocomplete
+              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+              selectProps={{
+                placeholder: 'Origin',
+                onChange: handleOriginChange,
+                value: origin, // Controlled value for clearing the field
+              }}
             />
           </div>
           <div>
             <label className="block text-lg font-medium mb-2" htmlFor="destination">
               Destination
             </label>
-            <input
-              id="destination"
-              type="text"
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Enter your destination"
+            <GooglePlacesAutocomplete
+              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+              selectProps={{
+                placeholder: 'Destination',
+                onChange: handleDestinationChange,
+                value: destination, // Controlled value for clearing the field
+              }}
             />
           </div>
           <button
             type="submit"
             className="w-full bg-blue-500 text-white p-2 rounded-md"
           >
-            Submit
+            Search
+          </button>
+          <button
+            type="button"
+            className="w-full bg-red-500 text-white p-2 rounded-md mt-2"
+            onClick={clearRoute}
+          >
+            Clear
           </button>
         </form>
+        <div className="mt-4">
+          <p>Distance: {distance}</p>
+          <p>Duration: {duration}</p>
+        </div>
       </div>
 
       <div className="w-full">
-        {mapSrc ? (
-          <iframe
-            className="w-full h-full p-2"
-            loading="lazy"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-            src={mapSrc}
-          ></iframe>
-        ) : (
-          <p>Loading map...</p>
-        )}
+        <GoogleMap
+          key={mapKey} // Changing key forces map to reload on "Clear"
+          center={center}
+          zoom={15}
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          options={{
+            zoomControl: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            fullscreenControl: false,
+          }}
+          onLoad={(map) => setMap(map)}
+        >
+          {/* Add markers only if the origin or destination is selected */}
+          {originLocation && <Marker position={originLocation} />}
+          {destinationLocation && <Marker position={destinationLocation} />}
+          {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
+        </GoogleMap>
       </div>
 
       <ToastContainer />

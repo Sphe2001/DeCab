@@ -5,6 +5,7 @@ import {
   Marker,
   DirectionsRenderer,
 } from '@react-google-maps/api';
+import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
 const center = { lat: 48.8584, lng: 2.2945 };
 
@@ -18,23 +19,23 @@ export default function DriverHomePage() {
   const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
   const [distance, setDistance] = useState<string>('');
   const [duration, setDuration] = useState<string>('');
-
-  const originRef = useRef<HTMLInputElement>(null);
-  const destinationRef = useRef<HTMLInputElement>(null);
+  
+  const [origin, setOrigin] = useState<string | null>(null);
+  const [destination, setDestination] = useState<string | null>(null);
 
   if (!isLoaded) {
     return <p>Loading map...</p>;
   }
 
   async function calculateRoute(): Promise<void> {
-    if (originRef.current?.value === '' || destinationRef.current?.value === '') {
+    if (!origin || !destination) {
       return;
     }
 
     const directionsService = new google.maps.DirectionsService();
     const results = await directionsService.route({
-      origin: originRef.current?.value as string,
-      destination: destinationRef.current?.value as string,
+      origin,
+      destination,
       travelMode: google.maps.TravelMode.DRIVING,
     });
     setDirectionsResponse(results);
@@ -46,8 +47,8 @@ export default function DriverHomePage() {
     setDirectionsResponse(null);
     setDistance('');
     setDuration('');
-    if (originRef.current) originRef.current.value = '';
-    if (destinationRef.current) destinationRef.current.value = '';
+    setOrigin(null);
+    setDestination(null);
   }
 
   return (
@@ -71,18 +72,22 @@ export default function DriverHomePage() {
       </div>
 
       <div className="mt-4 flex flex-col items-center">
-        <input
-          type="text"
-          placeholder="Origin"
-          ref={originRef}
-          className="border rounded px-4 py-2 mb-2 w-64"
-        />
-        <input
-          type="text"
-          placeholder="Destination"
-          ref={destinationRef}
-          className="border rounded px-4 py-2 mb-2 w-64"
-        />
+        <div className="w-64">
+          <GooglePlacesAutocomplete
+            apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+            selectProps={{
+              placeholder: 'Origin',
+              onChange: (value: any) => setOrigin(value?.label || ''),
+            }}
+          />
+          <GooglePlacesAutocomplete
+            apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+            selectProps={{
+              placeholder: 'Destination',
+              onChange: (value: any) => setDestination(value?.label || ''),
+            }}
+          />
+        </div>
         <div className="flex space-x-2">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded"

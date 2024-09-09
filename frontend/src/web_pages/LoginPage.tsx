@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
@@ -13,29 +13,47 @@ export default function LoginPage() {
   const [selectedOption, setSelectedOption] = useState('client');
 
   const navigate = useNavigate();
- 
+  
+
+  useEffect(() => {
+    const savedFormData = localStorage.getItem('loginFormData');
+    if (savedFormData) {
+      setFormData(JSON.parse(savedFormData));
+    }
+
+    const savedOption = localStorage.getItem('selectedOption');
+    if (savedOption) {
+      setSelectedOption(savedOption);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('loginFormData', JSON.stringify(formData));
+    localStorage.setItem('selectedOption', selectedOption);
+  }, [formData, selectedOption]);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
   let goToPage = '/c-home';
 
-  if(selectedOption === 'driver'){
+  if (selectedOption === 'driver') {
     goToPage = '/d-home';
   }
 
-  const handleSubmit = async (e: FormEvent <HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-      const response = await axios.post(`http://localhost:8181/api/${selectedOption}/auth/authenticate`, formData)
-      .then(() => {
-        navigate(goToPage);
-        toast.success("Successfully logged in!");
-      })
-      .catch(() => {
-        toast.error("Invalid Email or password");
-      });
-      
+
+    try {
+      const response = await axios.post(`http://localhost:8181/api/${selectedOption}/auth/authenticate`, formData);
+      const { token } = response.data;
+      localStorage.setItem('authToken', token); 
+      navigate(goToPage);
+      toast.success("Successfully logged in!");
+    } catch {
+      toast.error("Invalid Email or password");
+    }
   };
 
   return (
@@ -101,6 +119,7 @@ export default function LoginPage() {
                   id="email"
                   name="email"
                   type="email"
+                  value={formData.email} 
                   onChange={handleChange}
                   required
                   autoComplete="email"
@@ -125,6 +144,7 @@ export default function LoginPage() {
                   id="password"
                   name="password"
                   type="password"
+                  value={formData.password} 
                   onChange={handleChange}
                   required
                   autoComplete="current-password"
@@ -152,7 +172,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-</div>
+    </div>
   );
 }
-
