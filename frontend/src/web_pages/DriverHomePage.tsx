@@ -7,7 +7,7 @@ import {
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
-const center = { lat: 48.8584, lng: 2.2945 };
+const center = { lat: -25.749362, lng: 28.188300 };
 
 export default function DriverHomePage() {
   const { isLoaded } = useJsApiLoader({

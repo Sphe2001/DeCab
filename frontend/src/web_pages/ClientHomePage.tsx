@@ -9,7 +9,7 @@ import {
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 
-const defaultCenter = { lat: 48.8584, lng: 2.2945 }; // Fallback center
+const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
 
 export default function ClientHomePage() {
   const { isLoaded } = useJsApiLoader({
@@ -18,11 +18,11 @@ export default function ClientHomePage() {
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapKey, setMapKey] = useState(1); // Key for reloading the map on clear
+  const [mapKey, setMapKey] = useState(1); 
   const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
   const [distance, setDistance] = useState<string>('');
   const [duration, setDuration] = useState<string>('');
-  const [center, setCenter] = useState(defaultCenter); // Default center
+  const [center, setCenter] = useState(defaultCenter); 
 
   const [origin, setOrigin] = useState<{ label: string; value: any } | null>(null);
   const [destination, setDestination] = useState<{ label: string; value: any } | null>(null);
@@ -30,7 +30,6 @@ export default function ClientHomePage() {
   const [destinationLocation, setDestinationLocation] = useState<google.maps.LatLng | null>(null);
 
   useEffect(() => {
-    // Get the user's current location and set the map's center
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
@@ -47,7 +46,7 @@ export default function ClientHomePage() {
   }
 
   async function calculateRoute(e: React.FormEvent): Promise<void> {
-    e.preventDefault(); // Prevent form submission from reloading the page
+    e.preventDefault(); 
 
     if (!origin || !destination) {
       toast.error('Please select both origin and destination');
@@ -78,21 +77,20 @@ export default function ClientHomePage() {
     setDestination(null);
     setOriginLocation(null);
     setDestinationLocation(null);
-    // Trigger map reload to remove markers
     setMapKey(mapKey + 1);
     toast.info('Route cleared');
   }
 
   const handleOriginChange = (value: any) => {
     setOrigin(value);
-    setOriginLocation(value?.value.geometry.location || null); // Set the location for marker
-    setDirectionsResponse(null); // Clear route when origin is changed
+    setOriginLocation(value?.value.geometry.location || null);
+    setDirectionsResponse(null);
   };
 
   const handleDestinationChange = (value: any) => {
     setDestination(value);
-    setDestinationLocation(value?.value.geometry.location || null); // Set the location for marker
-    setDirectionsResponse(null); // Clear route when destination is changed
+    setDestinationLocation(value?.value.geometry.location || null);
+    setDirectionsResponse(null);
   };
 
   return (
@@ -109,7 +107,7 @@ export default function ClientHomePage() {
               selectProps={{
                 placeholder: 'Origin',
                 onChange: handleOriginChange,
-                value: origin, // Controlled value for clearing the field
+                value: origin, 
               }}
             />
           </div>
@@ -122,7 +120,7 @@ export default function ClientHomePage() {
               selectProps={{
                 placeholder: 'Destination',
                 onChange: handleDestinationChange,
-                value: destination, // Controlled value for clearing the field
+                value: destination,
               }}
             />
           </div>
@@ -148,7 +146,7 @@ export default function ClientHomePage() {
 
       <div className="w-full">
         <GoogleMap
-          key={mapKey} // Changing key forces map to reload on "Clear"
+          key={mapKey}
           center={center}
           zoom={15}
           mapContainerStyle={{ width: '100%', height: '100%' }}
@@ -160,7 +158,7 @@ export default function ClientHomePage() {
           }}
           onLoad={(map) => setMap(map)}
         >
-          {/* Add markers only if the origin or destination is selected */}
+          
           {originLocation && <Marker position={originLocation} />}
           {destinationLocation && <Marker position={destinationLocation} />}
           {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
