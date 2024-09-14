@@ -8,10 +8,67 @@ import {
   DirectionsRenderer,
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+import { getToken } from './auth/AuthCheck';
+import { useNavigate } from 'react-router-dom';
 
 const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
 
-export default function ClientHomePage() {
+
+
+export default  function ClientHomePage() {
+  const navigate = useNavigate();
+  const [isClient, setIsClient] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const token = getToken();
+
+      if (!token) {
+        toast.error('No token found, please login.');
+        navigate('/');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:8181/api/authCheck/isClient', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user role');
+        }
+
+        const data = await response.json();
+        if (data === true) {
+          setIsClient(true);
+        } else {
+          setIsClient(false);
+        }
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+        toast.error('Error fetching user role');
+        navigate('/');
+      }
+    };
+
+    fetchUserRole();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (isClient === false) {
+      toast.error('You are not authorized to access this page.');
+      navigate('/');
+    }
+  }, [isClient, navigate]);
+
+  
+  
+  
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY,
     libraries: ['places'],
@@ -92,6 +149,10 @@ export default function ClientHomePage() {
     setDestinationLocation(value?.value.geometry.location || null);
     setDirectionsResponse(null);
   };
+
+
+
+    
 
   return (
     <div className="h-screen w-screen flex">

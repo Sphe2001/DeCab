@@ -1,6 +1,8 @@
 package com.dcab.backend.driverAuth;
 
 
+import com.dcab.backend.clientAuth.AuthenticationRequest;
+import com.dcab.backend.clientAuth.AuthenticationResponse;
 import com.dcab.backend.config.JwtService;
 import com.dcab.backend.model.Driver;
 import com.dcab.backend.repository.DriverRepository;
@@ -44,9 +46,9 @@ public class AuthenticationService2 {
                         request.getPassword()
                 )
         );
-        var driver = repository.findByEmail(request.getEmail())
+        var client = repository.findByEmail(request.getEmail())
                 .orElseThrow();
-        var jwtToken = jwtService.generateToken(driver);
+        var jwtToken = jwtService.generateToken(client);
         return AuthenticationResponse2.builder()
                 .token(jwtToken)
                 .build();
