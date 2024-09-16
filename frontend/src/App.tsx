@@ -5,6 +5,9 @@ import ClientHomePage from './web_pages/ClientHomePage'
 import RegisterPage from './web_pages/RegisterPage'
 import DriverHomePage from './web_pages/DriverHomePage'
 import NavBar from './components/NavBar'
+import ClientAuth from './web_pages/auth/ClientAuth'
+import DriverAuth from './web_pages/auth/DriverAuth'
+import TestPage from './web_pages/TestPage'
 
 function App() {
 
@@ -14,9 +17,10 @@ function App() {
         <NavBar/>
           <Routes>
             <Route path='/' element ={<LoginPage/>}/>
-            <Route path='/c-home' element ={<ClientHomePage/>}/>
-            <Route path='/d-home' element ={<DriverHomePage/>}/>
             <Route path='/register' element ={<RegisterPage/>}/>
+            <Route path="/c-home" element={<ClientAuth> <ClientHomePage /> </ClientAuth> }/>
+            <Route path='/d-home' element ={<DriverAuth> <DriverHomePage/> </DriverAuth>}/>
+            <Route path='/t-page' element ={<TestPage/>}/>
           </Routes>
         </BrowserRouter>
     </div>

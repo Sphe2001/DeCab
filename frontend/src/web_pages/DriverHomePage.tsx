@@ -8,94 +8,66 @@ import {
   DirectionsRenderer,
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-import { getToken } from './auth/AuthCheck';
-import { useNavigate } from 'react-router-dom';
 
-const center = { lat: -25.749362, lng: 28.188300 };
+const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
 
 export default function DriverHomePage() {
-  const navigate = useNavigate();
-  const [isDriver, setIsDriver] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      const token = getToken();
-
-      if (!token) {
-        toast.error('No token found, please login.');
-        navigate('/');
-        return;
-      }
-
-      try {
-        const response = await fetch('http://localhost:8181/api/authCheck/isDriver', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user role');
-        }
-
-        const data = await response.json();
-        if (data === true) {
-          setIsDriver(true);
-        } else {
-          setIsDriver(false);
-        }
-      } catch (error) {
-        console.error('Error fetching user role:', error);
-        toast.error('Error fetching user role');
-        navigate('/');
-      }
-    };
-
-    fetchUserRole();
-  }, [navigate]);
-
-  useEffect(() => {
-    if (isDriver === false) {
-      toast.error('You are not authorized to access this page.');
-      navigate('/');
-    }
-  }, [isDriver, navigate]);
-
-
-
+  
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY,
     libraries: ['places'],
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [mapKey, setMapKey] = useState(1); 
   const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
   const [distance, setDistance] = useState<string>('');
   const [duration, setDuration] = useState<string>('');
-  
-  const [origin, setOrigin] = useState<string | null>(null);
-  const [destination, setDestination] = useState<string | null>(null);
+  const [center, setCenter] = useState(defaultCenter); 
+
+  const [origin, setOrigin] = useState<{ label: string; value: any } | null>(null);
+  const [destination, setDestination] = useState<{ label: string; value: any } | null>(null);
+  const [originLocation, setOriginLocation] = useState<google.maps.LatLng | null>(null);
+  const [destinationLocation, setDestinationLocation] = useState<google.maps.LatLng | null>(null);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCenter({ lat: latitude, lng: longitude });
+      },
+      () => {
+        toast.error('Could not retrieve your location');
+      }
+    );
+  }, []);
 
   if (!isLoaded) {
     return <p>Loading map...</p>;
   }
 
-  async function calculateRoute(): Promise<void> {
+  async function calculateRoute(e: React.FormEvent): Promise<void> {
+    e.preventDefault(); 
+
     if (!origin || !destination) {
+      toast.error('Please select both origin and destination');
       return;
     }
 
-    const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin,
-      destination,
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance?.text || '');
-    setDuration(results.routes[0].legs[0].duration?.text || '');
+    try {
+      const directionsService = new google.maps.DirectionsService();
+      const results = await directionsService.route({
+        origin: origin.label,
+        destination: destination.label,
+        travelMode: google.maps.TravelMode.DRIVING,
+      });
+      setDirectionsResponse(results);
+      setDistance(results.routes[0].legs[0].distance?.text || '');
+      setDuration(results.routes[0].legs[0].duration?.text || '');
+    } catch (error) {
+      toast.error('Could not calculate the route. Please try again.');
+      console.error('Error calculating route:', error);
+    }
   }
 
   function clearRoute() {
@@ -104,12 +76,78 @@ export default function DriverHomePage() {
     setDuration('');
     setOrigin(null);
     setDestination(null);
+    setOriginLocation(null);
+    setDestinationLocation(null);
+    setMapKey(mapKey + 1);
+    toast.info('Route cleared');
   }
 
+  const handleOriginChange = (value: any) => {
+    setOrigin(value);
+    setOriginLocation(value?.value.geometry.location || null);
+    setDirectionsResponse(null);
+  };
+
+  const handleDestinationChange = (value: any) => {
+    setDestination(value);
+    setDestinationLocation(value?.value.geometry.location || null);
+    setDirectionsResponse(null);
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="w-full h-2/3">
+    <div className="h-screen w-screen flex">
+      <div className="w-96 p-8">
+        <h1 className="text-2xl font-bold mb-4">Client Home Page</h1>
+        <form onSubmit={calculateRoute} className="space-y-4">
+          <div>
+            <label className="block text-lg font-medium mb-2" htmlFor="location">
+              Origin
+            </label>
+            <GooglePlacesAutocomplete
+              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+              selectProps={{
+                placeholder: 'Origin',
+                onChange: handleOriginChange,
+                value: origin, 
+              }}
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium mb-2" htmlFor="destination">
+              Destination
+            </label>
+            <GooglePlacesAutocomplete
+              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+              selectProps={{
+                placeholder: 'Destination',
+                onChange: handleDestinationChange,
+                value: destination,
+              }}
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-2 rounded-md"
+          >
+            Search
+          </button>
+          <button
+            type="button"
+            className="w-full bg-red-500 text-white p-2 rounded-md mt-2"
+            onClick={clearRoute}
+          >
+            Clear
+          </button>
+        </form>
+        <div className="mt-4">
+          <p>Distance: {distance}</p>
+          <p>Duration: {duration}</p>
+        </div>
+      </div>
+
+      <div className="w-full">
         <GoogleMap
+          key={mapKey}
           center={center}
           zoom={15}
           mapContainerStyle={{ width: '100%', height: '100%' }}
@@ -121,47 +159,14 @@ export default function DriverHomePage() {
           }}
           onLoad={(map) => setMap(map)}
         >
-          <Marker position={center} />
+          
+          {originLocation && <Marker position={originLocation} />}
+          {destinationLocation && <Marker position={destinationLocation} />}
           {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
         </GoogleMap>
       </div>
 
-      <div className="mt-4 flex flex-col items-center">
-        <div className="w-64">
-          <GooglePlacesAutocomplete
-            apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
-            selectProps={{
-              placeholder: 'Origin',
-              onChange: (value: any) => setOrigin(value?.label || ''),
-            }}
-          />
-          <GooglePlacesAutocomplete
-            apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
-            selectProps={{
-              placeholder: 'Destination',
-              onChange: (value: any) => setDestination(value?.label || ''),
-            }}
-          />
-        </div>
-        <div className="flex space-x-2">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={calculateRoute}
-          >
-            Calculate Route
-          </button>
-          <button
-            className="bg-red-500 text-white px-4 py-2 rounded"
-            onClick={clearRoute}
-          >
-            Clear Route
-          </button>
-        </div>
-        <div className="mt-4">
-          <p>Distance: {distance}</p>
-          <p>Duration: {duration}</p>
-        </div>
-      </div>
+      <ToastContainer />
     </div>
   );
 }

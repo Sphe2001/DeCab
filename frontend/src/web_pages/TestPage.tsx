@@ -1,31 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {
-  useJsApiLoader,
-  GoogleMap,
-  Marker,
-  DirectionsRenderer,
-} from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-
-const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
-
+import MapComponent from '../components/Map';
 
 
-export default  function ClientHomePage() {
-  
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY,
-    libraries: ['places'],
-  });
+const defaultCenter = { lat: -25.749362, lng: 28.188300 };
 
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapKey, setMapKey] = useState(1); 
+const key = import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY;
+
+export default function TestPage() {
   const [directionsResponse, setDirectionsResponse] = useState<google.maps.DirectionsResult | null>(null);
   const [distance, setDistance] = useState<string>('');
   const [duration, setDuration] = useState<string>('');
-  const [center, setCenter] = useState(defaultCenter); 
+  const [center, setCenter] = useState(defaultCenter);
 
   const [origin, setOrigin] = useState<{ label: string; value: any } | null>(null);
   const [destination, setDestination] = useState<{ label: string; value: any } | null>(null);
@@ -44,12 +32,8 @@ export default  function ClientHomePage() {
     );
   }, []);
 
-  if (!isLoaded) {
-    return <p>Loading map...</p>;
-  }
-
   async function calculateRoute(e: React.FormEvent): Promise<void> {
-    e.preventDefault(); 
+    e.preventDefault();
 
     if (!origin || !destination) {
       toast.error('Please select both origin and destination');
@@ -80,7 +64,6 @@ export default  function ClientHomePage() {
     setDestination(null);
     setOriginLocation(null);
     setDestinationLocation(null);
-    setMapKey(mapKey + 1);
     toast.info('Route cleared');
   }
 
@@ -96,10 +79,6 @@ export default  function ClientHomePage() {
     setDirectionsResponse(null);
   };
 
-
-
-    
-
   return (
     <div className="h-screen w-screen flex">
       <div className="w-96 p-8">
@@ -110,11 +89,11 @@ export default  function ClientHomePage() {
               Origin
             </label>
             <GooglePlacesAutocomplete
-              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+              apiKey={key}
               selectProps={{
                 placeholder: 'Origin',
                 onChange: handleOriginChange,
-                value: origin, 
+                value: origin,
               }}
             />
           </div>
@@ -123,7 +102,7 @@ export default  function ClientHomePage() {
               Destination
             </label>
             <GooglePlacesAutocomplete
-              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+              apiKey={key}
               selectProps={{
                 placeholder: 'Destination',
                 onChange: handleDestinationChange,
@@ -131,17 +110,10 @@ export default  function ClientHomePage() {
               }}
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md"
-          >
+          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md">
             Search
           </button>
-          <button
-            type="button"
-            className="w-full bg-red-500 text-white p-2 rounded-md mt-2"
-            onClick={clearRoute}
-          >
+          <button type="button" className="w-full bg-red-500 text-white p-2 rounded-md mt-2" onClick={clearRoute}>
             Clear
           </button>
         </form>
@@ -152,24 +124,12 @@ export default  function ClientHomePage() {
       </div>
 
       <div className="w-full">
-        <GoogleMap
-          key={mapKey}
+        <MapComponent
+          originLocation={originLocation}
+          destinationLocation={destinationLocation}
+          directionsResponse={directionsResponse}
           center={center}
-          zoom={15}
-          mapContainerStyle={{ width: '100%', height: '100%' }}
-          options={{
-            zoomControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-          }}
-          onLoad={(map) => setMap(map)}
-        >
-          
-          {originLocation && <Marker position={originLocation} />}
-          {destinationLocation && <Marker position={destinationLocation} />}
-          {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
-        </GoogleMap>
+        />
       </div>
 
       <ToastContainer />
