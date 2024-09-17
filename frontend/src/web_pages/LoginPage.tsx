@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import NavBar from '../components/NavBar';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -58,6 +59,7 @@ export default function LoginPage() {
 
   return (
     <div>
+      <NavBar/>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img

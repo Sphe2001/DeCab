@@ -8,6 +8,7 @@ import {
   DirectionsRenderer,
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+import ClientNavBar from '../components/ClientNavBar';
 
 const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
 
@@ -101,78 +102,83 @@ export default  function ClientHomePage() {
     
 
   return (
-    <div className="h-screen w-screen flex">
-      <div className="w-96 p-8">
-        <h1 className="text-2xl font-bold mb-4">Client Home Page</h1>
-        <form onSubmit={calculateRoute} className="space-y-4">
-          <div>
-            <label className="block text-lg font-medium mb-2" htmlFor="location">
-              Origin
-            </label>
-            <GooglePlacesAutocomplete
-              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
-              selectProps={{
-                placeholder: 'Origin',
-                onChange: handleOriginChange,
-                value: origin, 
-              }}
-            />
-          </div>
-          <div>
-            <label className="block text-lg font-medium mb-2" htmlFor="destination">
-              Destination
-            </label>
-            <GooglePlacesAutocomplete
-              apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
-              selectProps={{
-                placeholder: 'Destination',
-                onChange: handleDestinationChange,
-                value: destination,
-              }}
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-md"
-          >
-            Search
-          </button>
-          <button
-            type="button"
-            className="w-full bg-red-500 text-white p-2 rounded-md mt-2"
-            onClick={clearRoute}
-          >
-            Clear
-          </button>
-        </form>
-        <div className="mt-4">
-          <p>Distance: {distance}</p>
-          <p>Duration: {duration}</p>
-        </div>
-      </div>
+    <div>
+      <ClientNavBar/>
+        <div className="h-screen w-screen flex">
+              <div className="w-96 p-8">
+                <h1 className="text-2xl font-bold mb-4">Client Home Page</h1>
+                <form onSubmit={calculateRoute} className="space-y-4">
+                  <div>
+                    <label className="block text-lg font-medium mb-2" htmlFor="location">
+                      Origin
+                    </label>
+                    <GooglePlacesAutocomplete
+                      apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+                      selectProps={{
+                        placeholder: 'Origin',
+                        onChange: handleOriginChange,
+                        value: origin, 
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-lg font-medium mb-2" htmlFor="destination">
+                      Destination
+                    </label>
+                    <GooglePlacesAutocomplete
+                      apiKey={import.meta.env.VITE_REACT_APP_GOOGLE_API_KEY}
+                      selectProps={{
+                        placeholder: 'Destination',
+                        onChange: handleDestinationChange,
+                        value: destination,
+                      }}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-500 text-white p-2 rounded-md"
+                  >
+                    Search
+                  </button>
+                  <button
+                    type="button"
+                    className="w-full bg-red-500 text-white p-2 rounded-md mt-2"
+                    onClick={clearRoute}
+                  >
+                    Clear
+                  </button>
+                </form>
+                <div className="mt-4">
+                  <p>Distance: {distance}</p>
+                  <p>Duration: {duration}</p>
+                </div>
+              </div>
 
-      <div className="w-full">
-        <GoogleMap
-          key={mapKey}
-          center={center}
-          zoom={15}
-          mapContainerStyle={{ width: '100%', height: '100%' }}
-          options={{
-            zoomControl: false,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-          }}
-          onLoad={(map) => setMap(map)}
-        >
-          
-          {originLocation && <Marker position={originLocation} />}
-          {destinationLocation && <Marker position={destinationLocation} />}
-          {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
-        </GoogleMap>
-      </div>
+              <div className="w-full">
+                <GoogleMap
+                  key={mapKey}
+                  center={center}
+                  zoom={15}
+                  mapContainerStyle={{ width: '100%', height: '100%' }}
+                  options={{
+                    zoomControl: false,
+                    streetViewControl: false,
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                  }}
+                  onLoad={(map) => setMap(map)}
+                >
+                  
+                  {originLocation && <Marker position={originLocation} />}
+                  {destinationLocation && <Marker position={destinationLocation} />}
+                  {directionsResponse && <DirectionsRenderer directions={directionsResponse} />}
+                </GoogleMap>
+              </div>
 
-      <ToastContainer />
+              <ToastContainer />
+            </div>
+
     </div>
+    
   );
 }

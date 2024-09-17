@@ -8,6 +8,7 @@ import {
   DirectionsRenderer,
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
+import DriverNavBar from '../components/DriverNavBar';
 
 const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
 
@@ -95,7 +96,9 @@ export default function DriverHomePage() {
   };
 
   return (
-    <div className="h-screen w-screen flex">
+    <div>
+      <DriverNavBar/>
+        <div className="h-screen w-screen flex">
       <div className="w-96 p-8">
         <h1 className="text-2xl font-bold mb-4">Driver Home Page</h1>
         <form onSubmit={calculateRoute} className="space-y-4">
@@ -168,5 +171,7 @@ export default function DriverHomePage() {
 
       <ToastContainer />
     </div>
+    </div>
+    
   );
 }
