@@ -5,12 +5,12 @@ import React, { useState, useEffect } from 'react';
 import ClientAuth from '../web_pages/auth/ClientAuth';
 import DriverAuth from '../web_pages/auth/DriverAuth';
 import icon from '../assets/Profile Icon Silhouette PNG Transparent, Avatar Icon Profile Icon Member Login Vector Isolated, Login Icons, Profile Icons, Avatar Icons PNG Image For Free Download.jpeg'
-
+import { useNavigate } from 'react-router-dom';
 
 const navigation = [
-    { name: 'Home', href: '#', current: false },
-    { name: 'History', href: '#', current: false },
-    { name: 'Payment History', href: '#', current: false },
+    { name: 'Home', href: '/home', current: false },
+    { name: 'History', href: '/d-history', current: false },
+    { name: 'Payment History', href: '/d-payments', current: false },
 ]
 
 function classNames(...classes: string[]) {
@@ -18,7 +18,12 @@ function classNames(...classes: string[]) {
 }
 
 export default function DriverNavBar() {
-  
+  const navigate = useNavigate(); 
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/'); 
+  };
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -87,19 +92,17 @@ export default function DriverNavBar() {
                 className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
               >
                 <MenuItem>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
-                    Your Profile
+                  <a href="/d-manage/account" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                    Manage Account
                   </a>
                 </MenuItem>
                 <MenuItem>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
-                    Settings
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
                     Sign out
-                  </a>
+                  </button>
                 </MenuItem>
               </MenuItems>
             </Menu>

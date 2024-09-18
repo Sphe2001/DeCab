@@ -8,7 +8,7 @@ import {
   DirectionsRenderer,
 } from '@react-google-maps/api';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-import ClientNavBar from '../components/ClientNavBar';
+import ClientNavBar from '../../components/ClientNavBar';
 
 const defaultCenter = { lat: -25.749362, lng: 28.188300 }; 
 

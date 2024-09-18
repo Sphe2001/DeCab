@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom'; // To handle navigation after lo
 import icon from '../assets/Profile Icon Silhouette PNG Transparent, Avatar Icon Profile Icon Member Login Vector Isolated, Login Icons, Profile Icons, Avatar Icons PNG Image For Free Download.jpeg';
 
 const navigation = [
-    { name: 'Home', href: '#', current: false },
-    { name: 'My Rides', href: '#', current: false },
+    { name: 'Home', href: '/home', current: false },
+    { name: 'My Rides', href: '/c-myrides', current: false },
 ];
 
 function classNames(...classes: string[]) {
@@ -14,12 +14,11 @@ function classNames(...classes: string[]) {
 }
 
 export default function ClientNavBar() {
-  const navigate = useNavigate(); // Initialize navigation hook
+  const navigate = useNavigate(); 
 
-  // Logout function to clear local storage and navigate to home page
   const handleLogout = () => {
     localStorage.clear();
-    navigate('/'); // Redirect to the home page
+    navigate('/'); 
   };
 
   return (
@@ -87,13 +86,8 @@ export default function ClientNavBar() {
                 className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none"
               >
                 <MenuItem>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    Your Profile
-                  </a>
-                </MenuItem>
-                <MenuItem>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    Settings
+                  <a href="/c-manage/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Manage Account
                   </a>
                 </MenuItem>
                 <MenuItem>
