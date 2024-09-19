@@ -18,7 +18,6 @@ import java.util.Optional;
 public class AuthenticationService {
 
     private final ClientRepository repository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 

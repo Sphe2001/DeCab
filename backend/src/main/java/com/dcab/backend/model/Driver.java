@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,11 +28,10 @@ public class Driver implements UserDetails {
     private String phoneNumber;
     private Long id;
     private String role;
-    @Lob
-    private byte[] licence;
-    @Lob
-    private byte[] photo;
     private String password;
+
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
