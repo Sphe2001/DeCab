@@ -34,7 +34,7 @@ public class AuthenticationService2 {
                 .lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber())
                 .id(request.getId())
-                .email(request.getEmail())
+                .email(request.getEmail().toLowerCase())
                 .password(hashPassword(request.getPassword()))
                 .role("Driver")
                 .build();
@@ -53,11 +53,11 @@ public class AuthenticationService2 {
     public AuthenticationResponse2 authenticateDriver(AuthenticationRequest2 request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        request.getEmail().toLowerCase(),
                         request.getPassword()
                 )
         );
-        var client = repository.findByEmail(request.getEmail())
+        var client = repository.findByEmail(request.getEmail().toLowerCase())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(client);
         return AuthenticationResponse2.builder()
@@ -79,11 +79,12 @@ public class AuthenticationService2 {
 
             updateDriver.setFirstName(request.getFirstName());
             updateDriver.setLastName(request.getLastName());
-            updateDriver.setEmail(request.getEmail());
+            updateDriver.setEmail(request.getEmail().toLowerCase());
             updateDriver.setPhoneNumber(request.getPhoneNumber());
             updateDriver.setId(request.getId());
             if(licenceFile != null && !licenceFile.isEmpty()) {
                 Image licenceImage = Image.builder()
+                        .title("Licence")
                         .fileName(licenceFile.getOriginalFilename())
                         .fileType(licenceFile.getContentType())
                         .data(licenceFile.getBytes())
@@ -94,6 +95,7 @@ public class AuthenticationService2 {
 
             if(photoFile != null && !photoFile.isEmpty()) {
                 Image photoImage = Image.builder()
+                        .title("Photo")
                         .fileName(photoFile.getOriginalFilename())
                         .fileType(photoFile.getContentType())
                         .data(photoFile.getBytes())

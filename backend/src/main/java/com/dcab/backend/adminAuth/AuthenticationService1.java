@@ -21,7 +21,7 @@ public class AuthenticationService1 {
     public AuthenticationResponse1 registerAdmin(RegisterRequest1 request) {
         var admin = Admin.builder()
                 .staffNumber(request.getStaffNumber())
-                .firstName(request.getFirstName())
+                .firstName(request.getFirstName().toLowerCase())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role("Admin")

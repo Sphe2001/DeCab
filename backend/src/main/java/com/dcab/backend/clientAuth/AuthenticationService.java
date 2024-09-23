@@ -28,7 +28,7 @@ public class AuthenticationService {
         }
             var client = Client.builder()
                     .firstName(request.getFirstName())
-                    .email(request.getEmail())
+                    .email(request.getEmail().toLowerCase())
                     .phoneNumber(request.getPhoneNumber())
                     .password(hashPassword(request.getPassword()))
                     .role("Client")
@@ -49,11 +49,11 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        request.getEmail().toLowerCase(),
                         request.getPassword()
                 )
         );
-        var client = repository.findByEmail(request.getEmail())
+        var client = repository.findByEmail(request.getEmail().toLowerCase())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(client);
         return AuthenticationResponse.builder()
@@ -71,7 +71,7 @@ public class AuthenticationService {
         if(client.isPresent()){
             Client updateClient = client.get();
             updateClient.setFirstName(request.getFirstName());
-            updateClient.setEmail(request.getEmail());
+            updateClient.setEmail(request.getEmail().toLowerCase());
             updateClient.setPhoneNumber(request.getPhoneNumber());
 
             repository.save(updateClient);
