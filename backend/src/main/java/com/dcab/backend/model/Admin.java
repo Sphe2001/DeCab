@@ -24,10 +24,11 @@ public class Admin implements UserDetails {
     @Id
     @GeneratedValue
     private Integer adminId;
-    private Integer stuffNumber;
+    private String staffNumber;
     private String firstName;
     private String email;
     private String password;
+    private String role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -41,26 +42,26 @@ public class Admin implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return staffNumber;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;
     }
 }

@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "Vehicles")
-public class Vehicle {
+public class
+Vehicle {
 
     @Id
     @GeneratedValue
@@ -23,10 +24,10 @@ public class Vehicle {
     private String name;
     private String numberPlate;
     private String colour;
-    private Integer Size;
+    private Integer seats;
+    private String carType;
     @Lob
     private byte[] insurance;
-    private String carType;
     @Lob
     private byte[] image;
 }
