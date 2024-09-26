@@ -5,6 +5,7 @@ import com.dcab.backend.clientAuth.UpdateRequest;
 import com.dcab.backend.model.Client;
 import com.dcab.backend.model.Driver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,12 +34,18 @@ public class AuthenticationController2 {
         return ResponseEntity.ok(service.authenticateDriver(request));
     }
 
+
+
     @GetMapping("/getDriver")
-    public ResponseEntity<Optional<Driver>> getDriver(
-            @RequestHeader ("Authorization") String token
+    public ResponseEntity<DriverDTO> getDriverDTO(
+            @RequestHeader("Authorization") String token
     ){
         String extractedToken = token.replace("Bearer ", "");
-        return ResponseEntity.ok(service.getDriver(extractedToken));
+        Optional<DriverDTO> driverDTO = service.getDriverDTO(extractedToken);
+
+        return driverDTO
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PutMapping("/update/driver")

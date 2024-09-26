@@ -13,11 +13,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +68,23 @@ public class AuthenticationService2 {
                 .token(jwtToken)
                 .build();
     }
+    
+@Transactional(readOnly = true)
+public Optional<DriverDTO> getDriverDTO(String token){
+    String email = jwtService.extractClaim(token, claims -> claims.getSubject());
+    Optional<Driver> driver = repository.findByEmail(email);
+
+    return driver.map(this::convertToDTO); // Map entity to DTO
+}
+
+    private DriverDTO convertToDTO(Driver driver) {
+        List<ImageDTO> imageDTOs = driver.getImages().stream()
+                .map(image -> new ImageDTO(image.getId(), image.getTitle(), image.getFileName(), image.getFileType()))
+                .collect(Collectors.toList());
+
+        return new DriverDTO(driver.getDriverId(), driver.getFirstName(), driver.getLastName(),
+                driver.getEmail(), driver.getPhoneNumber(), driver.getId(), driver.getRole(), imageDTOs);
+    }
 
     public Optional<Driver> getDriver(String token){
         String email= jwtService.extractClaim(token, claims -> claims.getSubject());
@@ -71,6 +92,7 @@ public class AuthenticationService2 {
         return repository.findByEmail(email);
     }
 
+    @Transactional
     public boolean update(UpdateRequest2 request, String token, MultipartFile licenceFile, MultipartFile photoFile) throws IOException {
         Optional<Driver> driver = getDriver(token);
 
