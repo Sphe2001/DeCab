@@ -350,7 +350,6 @@ export default function DriverManageAccountPage() {
                         name="licence"
                         type="file"
                         accept="image/*"
-                        placeholder='Select File'
                         onChange={handleFileChange}
                         disabled={!isEditable}
                         className={`block w-full rounded-md py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
