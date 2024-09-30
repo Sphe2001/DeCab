@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DriverNavBar from '../../components/DriverNavBar';
 import { getToken, clearToken } from '../auth/GetToken';
-import { KeyIcon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, ChevronRightIcon, XMarkIcon, ArrowUpTrayIcon, XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import DriverPasswordReset from '../../components/DriverPasswordReset';
@@ -40,6 +40,35 @@ export default function DriverManageAccountPage() {
   
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [showPasswordReset, setShowPasswordReset] = useState<boolean>(false);
+
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    
+    const fetchPhoto = async () => {
+      const token = getToken(); 
+      try {
+        const response = await fetch('http://localhost:8181/api/driver/auth/getPhoto', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch the image');
+        }
+
+        const base64Image = await response.text();
+        
+        setImageSrc(`data:image/jpeg;base64,${base64Image}`);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      }
+    };
+
+    fetchPhoto();
+  }, []);
+
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -88,7 +117,7 @@ export default function DriverManageAccountPage() {
     if (files && files.length > 0) {
       setUserDetails((prevDetails) => ({
         ...prevDetails,
-        [name]: files[0], // Handle file input
+        [name]: files[0], 
       }));
     }
   };
@@ -122,7 +151,7 @@ export default function DriverManageAccountPage() {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        body: formData, // Send FormData instead of JSON
+        body: formData, 
       });
 
       if (!response.ok) {
@@ -149,6 +178,42 @@ export default function DriverManageAccountPage() {
   const handleCloseModal = () => {
     setShowPasswordReset(false);
   };
+
+  const [hasLicence, setHasLicence] = useState<boolean | null>(null);
+
+    useEffect(() => {
+      const fetchLicenceStatus = async () => {
+        const token = getToken();
+
+        if (!token) {
+          toast.error('No token found, please login.');
+          navigate('/');
+          return;
+        }
+
+        try {
+          const response = await fetch('http://localhost:8181/api/driver/auth/hasLicence', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch license status');
+          }
+
+          const data = await response.json();
+          setHasLicence(data);
+        } catch (error) {
+          toast.error('Error fetching license status');
+        }
+      };
+
+      fetchLicenceStatus();
+    }, [navigate]);
+  
 
   return (
     <div>
@@ -178,11 +243,46 @@ export default function DriverManageAccountPage() {
         </div>
 
         <div className="w-3/4 p-8">
+        
           {activeTab === 'Profile' && (
             <div>
               <h2 className="text-2xl font-bold mb-4">User Profile</h2>
+                
               <form>
                 <div className="mb-4">
+                <div className="relative inline-block">
+                  {imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      alt="Driver"
+                      className="w-48 h-48 rounded-full object-fill border-2" // Rounded image with fixed size
+                    />
+                  ) : (
+                    <p>Loading image...</p>
+                  )}
+
+                  {/* Photo Upload with Button */}
+                  {isEditable && (
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('photoUpload')?.click()}
+                      className="absolute bottom-2 right-2 bg-blue-500 text-white p-2 rounded-full"
+                    >
+                      <ArrowUpTrayIcon className="w-6 h-6" />
+                    </button>
+                  )}
+
+                  {/* Hidden file input */}
+                  <input
+                    id="photoUpload"
+                    name="photo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </div>
+
                   <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
                     First Name
                   </label>
@@ -233,41 +333,31 @@ export default function DriverManageAccountPage() {
                   />
                 </div>
 
-                {/* Photo Upload */}
-                <div className="mb-4">
-                  <label htmlFor="photo" className="block text-sm font-medium leading-6 text-gray-900">
-                    Upload Photo
-                  </label>
-                  <input
-                    id="photo"
-                    name="photo"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    disabled={!isEditable}
-                    className={`block w-full rounded-md py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
-                      isEditable ? 'focus:ring-2 focus:ring-inset focus:ring-indigo-600' : ''
-                    }`}
-                  />
-                </div>
+                
 
-                {/* Licence Upload */}
-                <div className="mb-4">
-                  <label htmlFor="licence" className="block text-sm font-medium leading-6 text-gray-900">
-                    Upload Licence
-                  </label>
-                  <input
-                    id="licence"
-                    name="licence"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    disabled={!isEditable}
-                    className={`block w-full rounded-md py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
-                      isEditable ? 'focus:ring-2 focus:ring-inset focus:ring-indigo-600' : ''
-                    }`}
-                  />
-                </div>
+                  {/* Licence Upload */} 
+                    <div className="mb-4"> 
+                      <label htmlFor="licence" className="block text-sm font-medium leading-6 text-gray-900">
+                        Upload Licence
+                        {hasLicence === false || hasLicence === null ? (
+                          <XCircleIcon className="w-6 h-6 text-red-500 inline ml-2" />
+                        ) : (
+                          <CheckCircleIcon className="w-6 h-6 text-green-500 inline ml-2" />
+                        )}
+                      </label>
+                      <input
+                        id="licence"
+                        name="licence"
+                        type="file"
+                        accept="image/*"
+                        placeholder='Select File'
+                        onChange={handleFileChange}
+                        disabled={!isEditable}
+                        className={`block w-full rounded-md py-1.5 pl-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 ${
+                          isEditable ? 'focus:ring-2 focus:ring-inset focus:ring-indigo-600' : ''
+                        }`}
+                      />
+                    </div>
 
                 <div className="mb-4">
                   <label htmlFor="phoneNumber" className="block text-sm font-medium leading-6 text-gray-900">

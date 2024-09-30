@@ -1,14 +1,13 @@
 package com.dcab.backend.driverAuth;
 
 
-import com.dcab.backend.clientAuth.PasswordUpdateRequest;
+
 import com.dcab.backend.config.JwtService;
-import com.dcab.backend.model.Client;
 import com.dcab.backend.model.Driver;
 import com.dcab.backend.model.Image;
 import com.dcab.backend.repository.DriverRepository;
+import com.dcab.backend.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,13 +21,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService2 {
     private final DriverRepository repository;
+    private final ImageRepository imageRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -74,7 +72,7 @@ public Optional<DriverDTO> getDriverDTO(String token){
     String email = jwtService.extractClaim(token, claims -> claims.getSubject());
     Optional<Driver> driver = repository.findByEmail(email);
 
-    return driver.map(this::convertToDTO); // Map entity to DTO
+    return driver.map(this::convertToDTO);
 }
 
     private DriverDTO convertToDTO(Driver driver) {
@@ -104,26 +102,51 @@ public Optional<DriverDTO> getDriverDTO(String token){
             updateDriver.setEmail(request.getEmail().toLowerCase());
             updateDriver.setPhoneNumber(request.getPhoneNumber());
             updateDriver.setId(request.getId());
-            if(licenceFile != null && !licenceFile.isEmpty()) {
-                Image licenceImage = Image.builder()
-                        .title("Licence")
-                        .fileName(licenceFile.getOriginalFilename())
-                        .fileType(licenceFile.getContentType())
-                        .data(licenceFile.getBytes())
-                        .driver(updateDriver)
-                        .build();
-                updateDriver.getImages().add(licenceImage);
+
+            Integer driverId = getDriverID(token);
+            if (licenceFile != null && !licenceFile.isEmpty()) {
+                Optional<Image> existingLicence = imageRepository.findByDriver_DriverIdAndTitle(driverId, "Licence");
+
+                if (existingLicence.isPresent()) {
+                    // Update existing licence image
+                    Image licenceImage = existingLicence.get();
+                    licenceImage.setFileName(licenceFile.getOriginalFilename());
+                    licenceImage.setFileType(licenceFile.getContentType());
+                    licenceImage.setData(licenceFile.getBytes());
+                } else {
+                    // Add new licence image
+                    Image newLicenceImage = Image.builder()
+                            .title("Licence")
+                            .fileName(licenceFile.getOriginalFilename())
+                            .fileType(licenceFile.getContentType())
+                            .data(licenceFile.getBytes())
+                            .driver(updateDriver)
+                            .build();
+                    updateDriver.getImages().add(newLicenceImage);
+                }
             }
 
-            if(photoFile != null && !photoFile.isEmpty()) {
-                Image photoImage = Image.builder()
-                        .title("Photo")
-                        .fileName(photoFile.getOriginalFilename())
-                        .fileType(photoFile.getContentType())
-                        .data(photoFile.getBytes())
-                        .driver(updateDriver)
-                        .build();
-                updateDriver.getImages().add(photoImage);
+            // Update or replace the photo image
+            if (photoFile != null && !photoFile.isEmpty()) {
+                Optional<Image> existingPhoto = imageRepository.findByDriver_DriverIdAndTitle(driverId, "Photo");
+
+                if (existingPhoto.isPresent()) {
+                    // Update existing photo image
+                    Image photoImage = existingPhoto.get();
+                    photoImage.setFileName(photoFile.getOriginalFilename());
+                    photoImage.setFileType(photoFile.getContentType());
+                    photoImage.setData(photoFile.getBytes());
+                } else {
+                    // Add new photo image
+                    Image newPhotoImage = Image.builder()
+                            .title("Photo")
+                            .fileName(photoFile.getOriginalFilename())
+                            .fileType(photoFile.getContentType())
+                            .data(photoFile.getBytes())
+                            .driver(updateDriver)
+                            .build();
+                    updateDriver.getImages().add(newPhotoImage);
+                }
             }
 
             repository.save(updateDriver);
@@ -149,5 +172,40 @@ public Optional<DriverDTO> getDriverDTO(String token){
 
         }
         return false;
+    }
+
+    private Integer getDriverID(String token){
+        String email= jwtService.extractClaim(token, claims -> claims.getSubject());
+        Optional<Driver> driver = repository.findByEmail(email);
+
+        return driver.get().getDriverId();
+    }
+
+
+
+    @Transactional(readOnly = true)
+    public String getPhoto(String token){
+        Integer driverId = getDriverID(token);
+
+        Optional<Image> photo = imageRepository.findByDriver_DriverIdAndTitle(driverId, "Photo");
+        if (photo.isPresent()) {
+
+            byte[] photoArray =  photo.get().getData();
+            return Base64.getEncoder().encodeToString(photoArray);
+        }
+
+        return null;
+
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasLicence(String token){
+        boolean check = false;
+        Integer driverId = getDriverID(token);
+        Optional<Image> licence = imageRepository.findByDriver_DriverIdAndTitle(driverId, "Licence");
+        if(licence.isPresent()){
+            check = true;
+        }
+        return check;
     }
 }

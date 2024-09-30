@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Optional;
 
 @RestController
@@ -67,4 +68,24 @@ public class AuthenticationController2 {
         String extractedToken = token.replace("Bearer ", "");
         return ResponseEntity.ok(service.passwordUpdate(request, extractedToken));
     }
+
+    @GetMapping("/getPhoto")
+    public ResponseEntity<String> getImage(
+            @RequestHeader ("Authorization") String token
+    ){
+        String extractedToken = token.replace("Bearer ", "");
+        return ResponseEntity.ok(service.getPhoto(extractedToken));
+    }
+
+    @GetMapping("/hasLicence")
+    public ResponseEntity<Boolean> hasLicence(
+            @RequestHeader ("Authorization") String token
+    ){
+        String extractedToken = token.replace("Bearer ", "");
+        return ResponseEntity.ok(service.hasLicence(extractedToken));
+    }
+
+
+
+
 }
