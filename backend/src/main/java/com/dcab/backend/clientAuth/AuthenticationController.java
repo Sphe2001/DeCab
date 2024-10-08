@@ -1,9 +1,14 @@
 package com.dcab.backend.clientAuth;
 
+import com.dcab.backend.driverAuth.DriverDTO;
 import com.dcab.backend.model.Client;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -28,20 +33,25 @@ public class AuthenticationController {
     }
 
     @GetMapping("/getClient")
-    public ResponseEntity<Optional<Client>> getClient(
-            @RequestHeader ("Authorization") String token
+    public ResponseEntity<ClientDTO> getClientDTO(
+            @RequestHeader("Authorization") String token
     ){
         String extractedToken = token.replace("Bearer ", "");
-        return ResponseEntity.ok(service.getClient(extractedToken));
+        Optional<ClientDTO> clientDTO = service.getClientDTO(extractedToken);
+
+        return clientDTO
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @PostMapping("/update/client")
+    @PutMapping("/update/client")
     public ResponseEntity<Boolean> updateClient(
             @RequestHeader ("Authorization") String token,
-            @RequestBody UpdateRequest request
-    ){
+            @RequestParam(value = "profile", required = false) MultipartFile profile,
+            @ModelAttribute UpdateRequest request
+    ) throws IOException {
         String extractedToken = token.replace("Bearer ", "");
-        return ResponseEntity.ok(service.update(request, extractedToken));
+        return ResponseEntity.ok(service.update(request, extractedToken, profile));
     }
 
     @PostMapping("/update/client/password")
@@ -51,5 +61,13 @@ public class AuthenticationController {
     ){
         String extractedToken = token.replace("Bearer ", "");
         return ResponseEntity.ok(service.passwordUpdate(request, extractedToken));
+    }
+
+    @GetMapping("/getPhoto")
+    public ResponseEntity<String> getImage(
+            @RequestHeader ("Authorization") String token
+    ){
+        String extractedToken = token.replace("Bearer ", "");
+        return ResponseEntity.ok(service.getPhoto(extractedToken));
     }
 }

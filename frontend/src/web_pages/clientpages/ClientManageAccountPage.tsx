@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import ClientNavBar from '../../components/ClientNavBar';
 import { getToken, clearToken } from '../auth/GetToken';
-import { KeyIcon , ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import PasswordReset from '../../components/PasswordReset';
-
+import { KeyIcon, ChevronRightIcon, XMarkIcon, ArrowUpTrayIcon, XCircleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 
 interface UserDetails {
   firstName: string;
   email: string;
   phoneNumber: string;
+  profile ?: File;
 }
 
 
@@ -21,7 +21,8 @@ export default function ClientManageAccountPage() {
   const [userDetails, setUserDetails] = useState<UserDetails>({
     firstName: '',
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    profile: undefined
   });
 
   const [activeTab, setActiveTab] = useState<string>('Profile');
@@ -29,11 +30,49 @@ export default function ClientManageAccountPage() {
   const [originalDetails, setOriginalDetails] = useState<UserDetails>({
     firstName: '',
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    profile: undefined
   }); 
   const [isEditable, setIsEditable] = useState<boolean>(false); 
   const [showPasswordReset, setShowPasswordReset] = useState<boolean>(false);
 
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    
+    const fetchPhoto = async () => {
+      const token = getToken(); 
+      try {
+        const response = await fetch('http://localhost:8181/api/client/auth/getPhoto', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch the image');
+        }
+
+        const base64Image = await response.text();
+        
+        setImageSrc(`data:image/jpeg;base64,${base64Image}`);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      }
+    };
+
+    fetchPhoto();
+  }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = e.target;
+    if (files && files.length > 0) {
+      setUserDetails((prevDetails) => ({
+        ...prevDetails,
+        [name]: files[0], 
+      }));
+    }
+  };
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -88,14 +127,22 @@ export default function ClientManageAccountPage() {
       return;
     }
 
+    const formData = new FormData();
+    formData.append('firstName', userDetails.firstName);
+    formData.append('email', userDetails.email);
+    formData.append('phoneNumber', userDetails.phoneNumber);
+
+    if (userDetails.profile) {
+      formData.append('profile', userDetails.profile);
+    }
+
     try {
-      const response = await fetch('http://localhost:8181/api/client/auth/updateClient', {
+      const response = await fetch('http://localhost:8181/api/client/auth/update/client', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(userDetails), 
+        body: formData, 
       });
 
       if (!response.ok) {
@@ -158,6 +205,39 @@ export default function ClientManageAccountPage() {
           
           <form>
             <div className="mb-4">
+            <div className="relative inline-block">
+                  {imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      alt="Client"
+                      className="w-48 h-48 rounded-full object-fill border-2" // Rounded image with fixed size
+                    />
+                  ) : (
+                    <p>Loading image...</p>
+                  )}
+
+                  {/* Photo Upload with Button */}
+                  {isEditable && (
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('photoUpload')?.click()}
+                      className="absolute bottom-2 right-2 bg-blue-500 text-white p-2 rounded-full"
+                    >
+                      <ArrowUpTrayIcon className="w-6 h-6" />
+                    </button>
+                  )}
+
+                  {/* Hidden file input */}
+                  <input
+                    id="photoUpload"
+                    name="profile"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </div>
+
               <label htmlFor="firstName" className="block text-sm font-medium leading-6 text-gray-900">
                 First Name
               </label>

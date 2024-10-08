@@ -30,6 +30,7 @@ public class Driver implements UserDetails {
     private Long id;
     private String role;
     private String password;
+    private Boolean isVerified;
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Image> images;

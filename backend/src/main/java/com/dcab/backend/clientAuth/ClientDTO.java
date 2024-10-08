@@ -1,25 +1,22 @@
-package com.dcab.backend.driverAuth;
+package com.dcab.backend.clientAuth;
 
-import jakarta.persistence.Lob;
+import com.dcab.backend.driverAuth.ImageDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+import java.util.List;
+
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest2 {
-
+public class ClientDTO {
+    private Integer clientId;
     private String firstName;
-    private String lastName;
     private String email;
     private String phoneNumber;
-    private Long id;
-    private byte[] licence;
-    private byte[] photo;
-    private String password;
     private String role;
-    private Boolean isVerified;
+    private List<ImageDTO> profilePhoto;
 }

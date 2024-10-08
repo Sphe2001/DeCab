@@ -39,6 +39,7 @@ public class AuthenticationService2 {
                 .email(request.getEmail().toLowerCase())
                 .password(hashPassword(request.getPassword()))
                 .role("Driver")
+                .isVerified(false)
                 .build();
         repository.save(driver);
         var jwtToken = jwtService.generateToken(driver);

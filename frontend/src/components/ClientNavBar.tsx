@@ -1,6 +1,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getToken } from '../web_pages/auth/GetToken';
 import { useNavigate } from 'react-router-dom'; // To handle navigation after logout
 import icon from '../assets/Profile Icon Silhouette PNG Transparent, Avatar Icon Profile Icon Member Login Vector Isolated, Login Icons, Profile Icons, Avatar Icons PNG Image For Free Download.jpeg';
 
@@ -14,6 +15,35 @@ function classNames(...classes: string[]) {
 }
 
 export default function ClientNavBar() {
+
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    
+    const fetchPhoto = async () => {
+      const token = getToken(); 
+      try {
+        const response = await fetch('http://localhost:8181/api/client/auth/getPhoto', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch the image');
+        }
+
+        const base64Image = await response.text();
+        
+        setImageSrc(`data:image/jpeg;base64,${base64Image}`);
+      } catch (error) {
+        console.error('Error fetching image:', error);
+      }
+    };
+
+    fetchPhoto();
+  }, []);
+  
   const navigate = useNavigate(); 
 
   const handleLogout = () => {
@@ -72,14 +102,26 @@ export default function ClientNavBar() {
             {/* Profile dropdown */}
             <Menu as="div" className="relative ml-3">
               <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-                  <span className="sr-only">Open user menu</span>
+              <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                <span className="sr-only">Open user menu</span>
+                {imageSrc ? (
                   <img
-                    alt="Profile"
-                    src={icon}
+                    src={imageSrc}
+                    alt="Client Profile"
+                    onError={(e) => {
+                      e.currentTarget.src = icon; // Fallback to icon
+                      e.currentTarget.alt = 'Fallback Icon'; // Set the alt text to the fallback icon
+                    }}
+                    className="w-8 h-8 rounded-full object-fill border-2"
+                  />
+                ) : (
+                  <img
+                    alt="Profile Icon"
+                    src={icon} // Default icon if no imageSrc
                     className="h-8 w-8 rounded-full"
                   />
-                </MenuButton>
+                )}
+              </MenuButton>
               </div>
               <MenuItems
                 transition
