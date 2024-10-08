@@ -4,7 +4,6 @@ import com.dcab.backend.config.JwtService;
 import com.dcab.backend.driverAuth.ImageDTO;
 import com.dcab.backend.model.Client;
 import com.dcab.backend.model.ClientImage;
-import com.dcab.backend.model.Image;
 import com.dcab.backend.repository.ClientImageRepository;
 import com.dcab.backend.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;

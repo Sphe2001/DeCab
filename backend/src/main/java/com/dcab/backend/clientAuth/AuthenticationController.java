@@ -1,7 +1,6 @@
 package com.dcab.backend.clientAuth;
 
-import com.dcab.backend.driverAuth.DriverDTO;
-import com.dcab.backend.model.Client;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
