@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,13 +23,11 @@ Vehicle {
     @OneToOne
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
-    private String name;
+    private String carName;
     private String numberPlate;
     private String colour;
     private Integer seats;
     private String carType;
-    @Lob
-    private byte[] insurance;
-    @Lob
-    private byte[] image;
+    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<VehicleImage> images;
 }
