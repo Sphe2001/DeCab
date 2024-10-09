@@ -175,7 +175,7 @@ public Optional<DriverDTO> getDriverDTO(String token){
         return false;
     }
 
-    private Integer getDriverID(String token){
+    public Integer getDriverID(String token){
         String email= jwtService.extractClaim(token, claims -> claims.getSubject());
         Optional<Driver> driver = repository.findByEmail(email);
 

@@ -21,13 +21,13 @@ Vehicle {
     @GeneratedValue
     private Integer vehicleID;
     @OneToOne
-    @JoinColumn(name = "driver_id", nullable = false)
+    @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = false)
     private Driver driver;
     private String carName;
     private String numberPlate;
     private String colour;
     private Integer seats;
     private String carType;
-    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VehicleImage> images;
 }
