@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    id: '',
+    identificationNumber: '',
     phoneNumber: '',
     email: '',
     password: '',
@@ -139,12 +139,12 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="id" className="block text-sm font-medium leading-6 text-gray-900">
-                  ID
+                <label htmlFor="identificationNumber" className="block text-sm font-medium leading-6 text-gray-900">
+                  Identification/Passport  Number 
                 </label>
                 <input
-                  id="id"
-                  name="id"
+                  id="identificationNumber"
+                  name="identificationNumber"
                   type="text"
                   onChange={handleChange}
                   required

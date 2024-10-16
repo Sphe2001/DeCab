@@ -27,7 +27,7 @@ public class Driver implements UserDetails {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private Long id;
+    private Long identificationNumber;
     private String role;
     private String password;
     private Boolean isVerified;

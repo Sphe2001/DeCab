@@ -221,7 +221,7 @@ export default function DriverManageAccountPage() {
       <ToastContainer />
       <div className="flex">
         {/* Left Sidebar */}
-        <div className="w-1/4 bg-gray-100 h-screen p-6">
+        <div className="w-1/5 bg-gray-100 h-screen p-6">
           <ol className="space-y-4">
             <li
               className={`cursor-pointer p-2 rounded-md ${

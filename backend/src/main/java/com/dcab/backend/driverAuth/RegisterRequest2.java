@@ -16,7 +16,7 @@ public class RegisterRequest2 {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private Long id;
+    private Long identificationNumber;
     private byte[] licence;
     private byte[] photo;
     private String password;

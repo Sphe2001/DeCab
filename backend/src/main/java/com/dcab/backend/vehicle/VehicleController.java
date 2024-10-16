@@ -26,11 +26,12 @@ public class VehicleController {
             @RequestParam(value = "frontView", required = false) MultipartFile frontViewFile,
             @RequestParam(value = "backView", required = false) MultipartFile backViewFile,
             @RequestParam(value = "sideView", required = false) MultipartFile sideViewFile,
+            @RequestParam(value = "licenceDisc", required = false) MultipartFile discFile,
             @ModelAttribute VehicleRegisterRequest request
     ) throws IOException {
         String extractedToken = token.replace("Bearer ", "");
-        return ResponseEntity.ok(service.RegisterVehicle(request, extractedToken, insuranceFile,
-                frontViewFile, backViewFile, sideViewFile));
+        return ResponseEntity.ok(service.registerVehicle(request, extractedToken, insuranceFile,
+                frontViewFile, backViewFile, sideViewFile, discFile));
     }
 
     @GetMapping("/getVehicle")

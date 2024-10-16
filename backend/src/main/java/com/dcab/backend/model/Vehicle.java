@@ -21,9 +21,9 @@ Vehicle {
     @GeneratedValue
     private Integer vehicleID;
     @OneToOne
-    @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "driver_id", referencedColumnName = "driverId", nullable = false)
     private Driver driver;
-    private String carName;
+    private String carModel;
     private String numberPlate;
     private String colour;
     private Integer seats;

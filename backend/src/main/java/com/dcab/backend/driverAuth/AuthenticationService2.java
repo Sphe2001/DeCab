@@ -35,7 +35,7 @@ public class AuthenticationService2 {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phoneNumber(request.getPhoneNumber())
-                .id(request.getId())
+                .identificationNumber(request.getIdentificationNumber())
                 .email(request.getEmail().toLowerCase())
                 .password(hashPassword(request.getPassword()))
                 .role("Driver")
@@ -82,7 +82,7 @@ public Optional<DriverDTO> getDriverDTO(String token){
                 .collect(Collectors.toList());
 
         return new DriverDTO(driver.getDriverId(), driver.getFirstName(), driver.getLastName(),
-                driver.getEmail(), driver.getPhoneNumber(), driver.getId(), driver.getRole(), imageDTOs);
+                driver.getEmail(), driver.getPhoneNumber(), driver.getIdentificationNumber(), driver.getRole(), imageDTOs);
     }
 
     public Optional<Driver> getDriver(String token){
@@ -102,7 +102,7 @@ public Optional<DriverDTO> getDriverDTO(String token){
             updateDriver.setLastName(request.getLastName());
             updateDriver.setEmail(request.getEmail().toLowerCase());
             updateDriver.setPhoneNumber(request.getPhoneNumber());
-            updateDriver.setId(request.getId());
+            updateDriver.setIdentificationNumber(request.getIdentificationNumber());
 
             Integer driverId = getDriverID(token);
             if (licenceFile != null && !licenceFile.isEmpty()) {

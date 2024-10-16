@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VehicleRegisterRequest {
-    private String carName;
+    private String carModel;
     private String numberPlate;
     private String colour;
     private Integer seats;

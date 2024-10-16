@@ -14,6 +14,7 @@ import DriverManageAccountPage from './web_pages/driverpages/DriverManageAccount
 import HistoryPage from './web_pages/driverpages/HistoryPage'
 import PaymentHistoryPage from './web_pages/driverpages/PaymentHistoryPage'
 import HomePage from './web_pages/HomePage'
+import VehiclePage from './web_pages/driverpages/VehiclePage'
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
             <Route path='/d-manage/account' element = {<DriverAuth> <DriverManageAccountPage/> </DriverAuth>}/>
             <Route path='/d-history' element = {<DriverAuth> <HistoryPage/> </DriverAuth>}/>
             <Route path='/d-payments' element = {<DriverAuth> <PaymentHistoryPage/> </DriverAuth>}/>
+            <Route path='/d-myvehicle' element = {<DriverAuth> <VehiclePage/> </DriverAuth>}/>
           </Routes>
         </BrowserRouter>
     </div>

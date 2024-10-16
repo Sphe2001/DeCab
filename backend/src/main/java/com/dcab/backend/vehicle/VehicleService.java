@@ -1,6 +1,6 @@
 package com.dcab.backend.vehicle;
 
-import com.dcab.backend.clientAuth.ClientDTO;
+
 import com.dcab.backend.config.JwtService;
 import com.dcab.backend.driverAuth.AuthenticationService2;
 import com.dcab.backend.driverAuth.ImageDTO;
@@ -23,15 +23,14 @@ public class VehicleService {
     private final VehicleRepository repository;
     private final  VehicleImageRepository vehicleImageRepository;
     private final AuthenticationService2 authenticationService2;
-    private final JwtService jwtService;
 
     @Transactional(readOnly = false)
-    public boolean RegisterVehicle(VehicleRegisterRequest request, String token, MultipartFile insuranceFile, MultipartFile frontViewFile, MultipartFile backViewFile, MultipartFile sideViewFile) throws IOException {
+    public boolean registerVehicle(VehicleRegisterRequest request, String token, MultipartFile insuranceFile, MultipartFile discFile, MultipartFile frontViewFile, MultipartFile backViewFile, MultipartFile sideViewFile) throws IOException {
 
         Optional<Driver> driver = authenticationService2.getDriver(token);
         if(driver.isPresent()){
             var vehicle = Vehicle.builder()
-                    .carName(request.getCarName())
+                    .carModel(request.getCarModel())
                     .carType(request.getCarType())
                     .seats(request.getSeats())
                     .colour(request.getColour())
@@ -42,6 +41,7 @@ public class VehicleService {
 
             List<VehicleImage> vehicleImages = List.of(
                     createVehicleImage("Insurance", insuranceFile, vehicle),
+                    createVehicleImage("Licence Disc", discFile, vehicle),
                     createVehicleImage("Front View", frontViewFile, vehicle),
                     createVehicleImage("Back View", backViewFile, vehicle),
                     createVehicleImage("Side View", sideViewFile, vehicle)
@@ -56,20 +56,20 @@ public class VehicleService {
     }
 
     private VehicleImage createVehicleImage(String title, MultipartFile file, Vehicle vehicle) throws IOException {
-        return VehicleImage.builder()
-                .title(title)
-                .fileName(file.getOriginalFilename())
-                .fileType(file.getContentType())
-                .data(file.getBytes())
-                .vehicle(vehicle)
-                .build();
+            return VehicleImage.builder()
+                    .title(title)
+                    .fileName(file.getOriginalFilename())
+                    .fileType(file.getContentType())
+                    .data(file.getBytes())
+                    .vehicle(vehicle)
+                    .build();
     }
 
     private VehicleRegisterRequest convertToDTO(Vehicle vehicle) {
         List<ImageDTO> imageDTOs = vehicle.getImages().stream()
                 .map(image -> new ImageDTO(image.getId(), image.getTitle(), image.getFileName(), image.getFileType()))
                 .collect(Collectors.toList());
-        return new VehicleRegisterRequest(vehicle.getCarName(), vehicle.getNumberPlate(), vehicle.getColour(), vehicle.getSeats(),
+        return new VehicleRegisterRequest(vehicle.getCarModel(), vehicle.getNumberPlate(), vehicle.getColour(), vehicle.getSeats(),
                 vehicle.getCarType(), vehicle.getDriver(), imageDTOs);
 
     }

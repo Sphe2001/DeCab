@@ -18,7 +18,7 @@ public class DriverDTO {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private Long id;
+    private Long identificationNumber;
     private String role;
     private List<ImageDTO> images;
 }
