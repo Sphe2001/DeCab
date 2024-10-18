@@ -3,6 +3,7 @@ import DriverNavBar from '../../components/DriverNavBar'
 import { getToken, clearToken } from '../auth/GetToken';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import GetImage from './GetImage';
 
 interface vehicleDetails{
     carModel : string;
@@ -60,6 +61,26 @@ export default function VehiclePage() {
         }));
       };
 
+      const [frontViewImage, setFrontViewImage] = useState<string | null>(null);
+      const [backViewImage, setBackViewImage] = useState<string | null>(null);
+      const [sideViewImage, setSideViewImage] = useState<string | null>(null);
+
+    //   useEffect(() => {
+    //     const fetchImages = async () => {
+    //       const frontImage = await GetImage({ url: 'http://localhost:8181/api/vehicle/getVehicleImage', title: 'Front View' });
+    //       setFrontViewImage(frontImage);
+    
+    //       const backImage = await GetImage({ url: 'http://localhost:8181/api/vehicle/getVehicleImage', title: 'Back View' });
+    //       setBackViewImage(backImage);
+    
+    //       const sideImage = await GetImage({ url: 'http://localhost:8181/api/vehicle/getVehicleImage', title: 'Side View' });
+    //       setSideViewImage(sideImage);
+    //     };
+    
+    //     fetchImages();
+    //   }, []);
+    
+
       const handleRegister = async () => {
         const token = getToken();
     
@@ -68,6 +89,7 @@ export default function VehiclePage() {
           navigate('/');
           return;
         }
+
     
         const formData = new FormData();
         formData.append('carModel', vehicleDetails.carModel);
@@ -309,7 +331,24 @@ export default function VehiclePage() {
             )}
             
                 {activeTab === 'My Vehicle' && (
-                    <div>My Vehicle</div>
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">My Vehicle</h2>
+                        <div className='flex justify-center'>
+                            <div className='w-48 h-48 border-2 object-fill'>
+                                <GetImage url="http://localhost:8181/api/vehicle/getVehicleImage" title="Front View" />
+                            </div>
+                            <div className='w-48 h-48 border-2'>
+                                <GetImage url="http://localhost:8181/api/vehicle/getVehicleImage" title="Side View" />
+                            </div>
+                            <div className='w-48 h-48 border-2 object-fill'>
+                                <GetImage url="http://localhost:8181/api/vehicle/getVehicleImage" title="Back View" />
+                            </div>
+                        
+                        </div>
+
+                        
+
+                    </div>
                 )}
             
                 {activeTab === 'Something' && (

@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -81,6 +83,29 @@ public class VehicleService {
         Optional<Vehicle> vehicle = repository.findByDriverId(driverID);
 
         return vehicle.map(this::convertToDTO);
+    }
+    public Integer getVehicleID(String token){
+        Integer driverID = authenticationService2.getDriverID(token);
+        Optional<Vehicle> vehicle = repository.findByDriverId(driverID);
+
+        return vehicle.get().getVehicleID();
+    }
+
+    @Transactional(readOnly = true)
+    public String getVehicleImage(String token, TitleRequest request){
+        Integer vehicleID = getVehicleID(token);
+
+        Optional<VehicleImage> image = vehicleImageRepository.findByVehicle_VehicleIdAndTitle(vehicleID, request.getTitle());
+
+        if (image.isPresent()) {
+
+            byte[] photoArray =  image.get().getData();
+
+            return Base64.getEncoder().encodeToString(photoArray);
+        }
+
+        return null;
+
     }
 
 

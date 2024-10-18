@@ -41,4 +41,12 @@ public class VehicleController {
         String extractedToken = token.replace("Bearer ", "");
         return ResponseEntity.ok(service.getVehicle(extractedToken));
     }
+
+    @PostMapping("/getVehicleImage")
+    public ResponseEntity<String> getVehicleImage(
+            @RequestHeader("Authorization") String token,
+            @RequestBody TitleRequest request){
+        String extractedToken = token.replace("Bearer ", "");
+        return ResponseEntity.ok(service.getVehicleImage(extractedToken, request));
+    }
 }

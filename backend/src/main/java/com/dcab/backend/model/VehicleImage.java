@@ -24,6 +24,6 @@ public class VehicleImage {
     private byte[] data;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vehicle_id")
+    @JoinColumn(name = "vehicle_id", referencedColumnName = "vehicleID", nullable = false)
     private Vehicle vehicle;
 }
