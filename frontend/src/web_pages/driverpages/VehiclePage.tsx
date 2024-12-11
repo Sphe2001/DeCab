@@ -64,22 +64,50 @@ export default function VehiclePage() {
       const [frontViewImage, setFrontViewImage] = useState<string | null>(null);
       const [backViewImage, setBackViewImage] = useState<string | null>(null);
       const [sideViewImage, setSideViewImage] = useState<string | null>(null);
+      const [carDetails, setCarDetails] = useState<vehicleDetails>({
+        carModel : '',
+        carType : '',
+        seats: 0,
+        numberPlate: '',
+        colour : '',
+        insurance : undefined,
+        licenceDisc : undefined,
+        frontView : undefined,
+        sideView : undefined,
+        backView : undefined,})
 
-    //   useEffect(() => {
-    //     const fetchImages = async () => {
-    //       const frontImage = await GetImage({ url: 'http://localhost:8181/api/vehicle/getVehicleImage', title: 'Front View' });
-    //       setFrontViewImage(frontImage);
-    
-    //       const backImage = await GetImage({ url: 'http://localhost:8181/api/vehicle/getVehicleImage', title: 'Back View' });
-    //       setBackViewImage(backImage);
-    
-    //       const sideImage = await GetImage({ url: 'http://localhost:8181/api/vehicle/getVehicleImage', title: 'Side View' });
-    //       setSideViewImage(sideImage);
-    //     };
-    
-    //     fetchImages();
-    //   }, []);
+      useEffect(() => {
+        const getVehicle = async() => {
+          const token = getToken();
+  
+          if (!token) {
+          toast.error('No token found, please login.');
+          navigate('/');
+          return;
+        }
+            
+          try {
+            const response = await fetch('http://localhost:8181/api/vehicle/getVehicle', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            })
+            if(!response.ok){
+              throw new Error("Failed to fetch the vehicle details")
+            }
+  
+            const data = await response.json()
+            setCarDetails(data)
 
+          } catch (error) {
+              toast.error('Error fetching vehicle details');
+          }
+        }
+        getVehicle();
+      }, [])
+      
       const handleUpdate = async() =>{
         const token = getToken();
     
@@ -371,15 +399,18 @@ export default function VehiclePage() {
                 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                       {['Front View', 'Side View', 'Back View'].map((title, index) => (
-                        <div
-                          key={index}
-                          className="w-48 h-48 flex items-center justify-center border-2 border-gray-300 rounded-md bg-white"
-                        >
-                          <GetImage
-                            url="http://localhost:8181/api/vehicle/getVehicleImage"
-                            title={title}
-                          />
-                        </div>
+                        // <div>
+                        //   <label htmlFor="" className='ml-14'>{title}</label>
+                          <div
+                            key={index}
+                            className="w-48 h-48 flex items-center justify-center border-2 border-gray-300 rounded-md bg-white"
+                          >
+                            <GetImage
+                              url="http://localhost:8181/api/vehicle/getVehicleImage"
+                              title={title}
+                            />
+                          </div>
+                        // </div>
                       ))}
                     </div>
                 
@@ -390,18 +421,24 @@ export default function VehiclePage() {
                         </label>
                         <input
                           id="numberPlate"
+                          name='numberPlate'
                           type="text"
                           className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          value={carDetails.numberPlate}
+                          readOnly
                         />
                       </li>
                       <li className="flex flex-col">
-                        <label htmlFor="model" className="text-gray-700 font-medium mb-2">
+                        <label  className="text-gray-700 font-medium mb-2">
                           Model
                         </label>
                         <input
-                          id="model"
+                          id="carModel"
+                          name='carModel'
                           type="text"
                           className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          value={carDetails.carModel}
+                          readOnly
                         />
                       </li>
                     </ul>
