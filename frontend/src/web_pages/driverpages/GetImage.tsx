@@ -15,8 +15,8 @@ export default function GetImage({ url, title }: Props) {
       const token = getToken();
       try {
         const response = await axios.post(
-          url, 
-          { title }, 
+          url,
+          { title },
           {
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -25,7 +25,7 @@ export default function GetImage({ url, title }: Props) {
           }
         );
 
-        const base64Image = response.data; 
+        const base64Image = response.data;
         setImageSrc(`data:image/jpeg;base64,${base64Image}`);
       } catch (error) {
         console.error('Error fetching image:', error);
@@ -35,5 +35,15 @@ export default function GetImage({ url, title }: Props) {
     fetchPhoto();
   }, [url, title]);
 
-  return imageSrc ? <img className='object-fill' src={imageSrc} alt={title} /> : null;
+  return imageSrc ? (
+    <img
+      className="object-cover w-full h-full rounded-md"
+      src={imageSrc}
+      alt={title}
+    />
+  ) : (
+    <div className="flex items-center justify-center w-full h-full bg-gray-200 rounded-md">
+      <span className="text-gray-500">Loading...</span>
+    </div>
+  );
 }

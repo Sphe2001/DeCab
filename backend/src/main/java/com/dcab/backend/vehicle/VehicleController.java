@@ -49,4 +49,13 @@ public class VehicleController {
         String extractedToken = token.replace("Bearer ", "");
         return ResponseEntity.ok(service.getVehicleImage(extractedToken, request));
     }
+
+    @PutMapping("/update/licencedisc")
+    public ResponseEntity<Boolean> updateLicenceDisc(
+            @RequestHeader("Authorization") String token,
+            @RequestParam(value = "licenceDisc", required = false) MultipartFile discFile
+    )throws IOException{
+        String extractedToken = token.replace("Bearer ", "");
+        return ResponseEntity.ok(service.updateLicenceDisc(extractedToken, discFile));
+    }
 }

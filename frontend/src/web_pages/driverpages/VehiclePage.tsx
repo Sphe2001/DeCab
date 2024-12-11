@@ -79,6 +79,41 @@ export default function VehiclePage() {
     
     //     fetchImages();
     //   }, []);
+
+      const handleUpdate = async() =>{
+        const token = getToken();
+    
+        if (!token) {
+          toast.error('No token found, please login.');
+          navigate('/');
+          return;
+        }
+        const formData = new FormData();
+
+        if (vehicleDetails.licenceDisc) {
+            formData.append('licenceDisc', vehicleDetails.licenceDisc);
+          }
+        
+          try {
+            const response = await fetch('http://localhost:8181/api/vehicle/update/licencedisc', {
+              method: 'PUT',
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              body: formData, 
+            });
+      
+            if (!response.ok) {
+              throw new Error('Failed to update vehicle details');
+            }
+            toast.success('Successfully Updated');
+            navigate('/d-myvehicle');
+          } catch (error) {
+            toast.error('Error updating vehicle');
+          }
+        
+
+      }
     
 
       const handleRegister = async () => {
@@ -331,24 +366,69 @@ export default function VehiclePage() {
             )}
             
                 {activeTab === 'My Vehicle' && (
-                    <div>
-                        <h2 className="text-2xl font-bold mb-4">My Vehicle</h2>
-                        <div className='flex justify-center'>
-                            <div className='w-48 h-48 border-2 object-fill'>
-                                <GetImage url="http://localhost:8181/api/vehicle/getVehicleImage" title="Front View" />
-                            </div>
-                            <div className='w-48 h-48 border-2'>
-                                <GetImage url="http://localhost:8181/api/vehicle/getVehicleImage" title="Side View" />
-                            </div>
-                            <div className='w-48 h-48 border-2 object-fill'>
-                                <GetImage url="http://localhost:8181/api/vehicle/getVehicleImage" title="Back View" />
-                            </div>
-                        
+                    <div className="p-6 bg-gray-50 rounded-lg shadow-md">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">My Vehicle</h2>
+                
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      {['Front View', 'Side View', 'Back View'].map((title, index) => (
+                        <div
+                          key={index}
+                          className="w-48 h-48 flex items-center justify-center border-2 border-gray-300 rounded-md bg-white"
+                        >
+                          <GetImage
+                            url="http://localhost:8181/api/vehicle/getVehicleImage"
+                            title={title}
+                          />
                         </div>
-
-                        
-
+                      ))}
                     </div>
+                
+                    <ul className="mt-8 space-y-4">
+                      <li className="flex flex-col">
+                        <label htmlFor="numberPlate" className="text-gray-700 font-medium mb-2">
+                          Number Plate
+                        </label>
+                        <input
+                          id="numberPlate"
+                          type="text"
+                          className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                      </li>
+                      <li className="flex flex-col">
+                        <label htmlFor="model" className="text-gray-700 font-medium mb-2">
+                          Model
+                        </label>
+                        <input
+                          id="model"
+                          type="text"
+                          className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                      </li>
+                    </ul>
+                
+                    <div className="mt-6 flex items-center gap-4">
+                        <div className="flex flex-col flex-grow">
+                            <label htmlFor="licenceDisc" className="text-gray-700 font-medium">
+                            Licence Disc
+                            </label>
+                            <input
+                            id="licenceDisc"
+                            name="licenceDisc"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleUpdate}
+                            className="px-6 py-2 mt-5 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-200"
+                        >
+                            Update
+                        </button>
+                    </div>
+                  </div>
                 )}
             
                 {activeTab === 'Something' && (

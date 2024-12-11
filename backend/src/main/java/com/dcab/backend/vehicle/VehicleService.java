@@ -108,5 +108,49 @@ public class VehicleService {
 
     }
 
+    private Optional<Vehicle> getCar(String token){
+        Integer driverId = authenticationService2.getDriverID(token);
+        Optional<Vehicle> vehicle = repository.findByDriverId(driverId);
+        return vehicle;
+    }
+
+    @Transactional
+    public boolean updateLicenceDisc(String token, MultipartFile discFile) throws IOException {
+
+        Optional<Vehicle> vehicle = getCar(token);
+
+        if(vehicle.isPresent()){
+            Vehicle updateVehicle = vehicle.get();
+
+            Integer vehicleId = getVehicleID(token);
+            if( discFile != null && !discFile.isEmpty()){
+                Optional<VehicleImage> existinglicenceDisc = vehicleImageRepository.findByVehicle_VehicleIdAndTitle(vehicleId, "Licence Disc");
+                if(existinglicenceDisc.isPresent()){
+                    VehicleImage licenceDisc = existinglicenceDisc.get();
+                    licenceDisc.setFileName(discFile.getOriginalFilename());
+                    licenceDisc.setFileType(discFile.getContentType());
+                    licenceDisc.setData(discFile.getBytes());
+                } else {
+                    VehicleImage newLicenceDisc = VehicleImage.builder()
+                            .title("Licence Disc")
+                            .fileName(discFile.getOriginalFilename())
+                            .fileType(discFile.getContentType())
+                            .data(discFile.getBytes())
+                            .vehicle(updateVehicle)
+                            .build();
+                    updateVehicle.getImages().add(newLicenceDisc);
+                }
+
+
+
+            }
+            repository.save(updateVehicle);
+            return true;
+
+        }
+
+        return false;
+    }
+
 
 }
