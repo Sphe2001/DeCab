@@ -1,5 +1,5 @@
 import React from 'react';
-import { RideInfo } from './RideInfo';
+import { RideInfo } from './RideComponents';
 
 interface ListProps {
   props: RideInfo;

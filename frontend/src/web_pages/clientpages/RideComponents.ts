@@ -1,6 +1,6 @@
 
-export interface RideInfo {
-    rideId : number;
+export interface RideComponents {
+    id : number;
     carType : string,
     seats : number,
     distance : string;
