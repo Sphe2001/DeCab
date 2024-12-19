@@ -1,9 +1,8 @@
 
 export interface RideInfo {
-    id : number;
+    rideId : number;
     carType : string,
     seats : number,
     distance : string;
-    icon : undefined,
-    price : number
+    cost : number
 }
