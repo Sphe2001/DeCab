@@ -3,6 +3,8 @@ import { Client } from "@stomp/stompjs";
 
 export default function PaymentHistoryPage() {
   useEffect(() => {
+
+
     // Initialize STOMP client
     const client = new Client({
       brokerURL: "ws://localhost:8181/ws", // Replace with your WebSocket URL
@@ -23,6 +25,7 @@ export default function PaymentHistoryPage() {
           destination: "/app/location",
           body: locationData,
         });
+        console.log(locationData, "after publish")
       },
       (error) => {
         console.error("Error watching geolocation:", error);
@@ -40,6 +43,8 @@ export default function PaymentHistoryPage() {
       }
     };
   }, []);
+  
 
   return <div>Sharing Live Location...</div>;
+  
 }

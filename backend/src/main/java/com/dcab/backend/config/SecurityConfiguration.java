@@ -19,22 +19,46 @@ public class SecurityConfiguration {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf().disable()
+//                .authorizeRequests()
+//                .requestMatchers("/api/**")
+//                .permitAll()
+//                .anyRequest()
+//                .authenticated()
+//                .and()
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+//                .authenticationProvider(authenticationProvider)
+//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeRequests()
-                .requestMatchers("/api/**")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws/**", "/topic/**", "/app/**", "/api/**") // Allow WebSocket and STOMP paths
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
+
+
+
 }
