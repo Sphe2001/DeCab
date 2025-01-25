@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class RideComponent {
-    @Id
-    @GeneratedValue
+
+
     private Integer id;
     private String carType;
     private Double distance;
     private Integer seats;
-    private Double costs;
+    private Double cost;
 
 }
